@@ -1,0 +1,50 @@
+.container{
+    height: 60px;
+    font-family: 'Urbanist', sans-serif;
+}
+
+.wrapper{
+    display: flex;
+    
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 40px;
+}
+
+.left{
+    display: 1;
+    align-items: center;
+    display: flex;
+}
+
+.right{
+    display: 1;
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.menuItem, .btn{
+   
+    font-family: 'Urbanist';
+    font-weight: bold;
+    font-size: 20px;
+    margin-left: 25px;
+    cursor: pointer;
+    padding-left: 20px;
+    padding-right: 30px;
+}
+.btn{
+    display: 1;
+    order: 1;
+}
+.menuItem div{
+    display: 1;
+    order: 2;
+    background-color: red;
+}
+
+.right div{
+    display: 1;
+    order: 2;
+}
