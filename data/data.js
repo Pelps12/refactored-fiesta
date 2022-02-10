@@ -40,16 +40,18 @@ export const sellers = [
         owner: "Tayo Aina",
         password: "klmn",
         createdAt: new Date(2022, 2, 9),
+        openingTime: "8AM",
+        closingTime: "10PM"
 
     }
 ]
 
-export const items = [
+export const goods = [
     {
         name: "Tomatoes",
-        image: `../public/images/$tomatoes.jpg`,
+        image: `../public/images/tomatoes.jpg`,
         perishable: true,
-
+        
 
     }
 ]

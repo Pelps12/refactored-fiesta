@@ -12,10 +12,13 @@ interface Seller{
     owner: string,
     password: string,
     createdAt: Date
+    openingTime: string,
+    closingTime: string
 
 }
 /*!!!!!DO NOT FORGET TO CHANGE THIS */
-const KEY = 'gfyrfu8gfibwe979r39r;[[pe]rgm3=jgo3[gk3=-'
+const KEY = process.env.KEY
+console.log(KEY)
 export default function (req: NextApiRequest, res:NextApiResponse){
 
     /*If no request body provided */
@@ -29,7 +32,7 @@ export default function (req: NextApiRequest, res:NextApiResponse){
     }
     
 
-    let {storename,long, lat, alt, owner, password} = req.body
+    let {storename,long, lat, alt, owner, password, startTime, closingTime} = req.body
 
     //NEVER TRUST THE CLIENT
     storename = DOMPurify.sanitize(storename)
@@ -38,6 +41,8 @@ export default function (req: NextApiRequest, res:NextApiResponse){
     alt = DOMPurify.sanitize(alt)
     owner = DOMPurify.sanitize(owner)
     password = DOMPurify.sanitize(password)
+    startTime = DOMPurify.sanitize(startTime)
+    closingTime = DOMPurify.sanitize(closingTime)
 
     /*Search for user */
     const seller = sellers.find(seller => seller.storename === storename)
@@ -60,7 +65,9 @@ export default function (req: NextApiRequest, res:NextApiResponse){
         location: [parseFloat(lat), parseFloat(long), parseFloat(alt)],
         owner,
         password,
-        createdAt: new Date(Date.now())
+        createdAt: new Date(Date.now()),
+        openingTime: startTime,
+        closingTime
     }
     console.log(newSeller)
     sellers.push(newSeller)
