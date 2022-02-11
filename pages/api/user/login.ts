@@ -26,14 +26,15 @@ export default async function handle(req: NextApiRequest, res:NextApiResponse){
             }
             
         
-            const {storename, password} = req.body
-            console.log(storename);
+            const {phoneNumber, password} = req.body
+            console.log(phoneNumber);
             const jwtVal = getCookies(req, 'jwt')
             console.log("JWT Value: "+ jwtVal)
-            const id:string = await checkUser(storename, password)
+            const id:string = await checkUser(phoneNumber, password)
             const loggedIn:string = await checkToken(jwtVal)
+            console.log(loggedIn)
         
-            if(loggedIn === "validSeller"){
+            if(loggedIn === "validBuyer"){
                 res.statusCode= 403,
                 res.json({
                     error: "Already logged in"
@@ -50,7 +51,7 @@ export default async function handle(req: NextApiRequest, res:NextApiResponse){
                 const token: string = jwt.sign(
                     {
                         id: id,
-                        description: Description.Seller
+                        description: Description.Buyer
                     },
                     KEY, {
                         expiresIn: '14d'
@@ -60,7 +61,7 @@ export default async function handle(req: NextApiRequest, res:NextApiResponse){
                 //Set the token as valid in Redis cache
                 //Expire it after 14 days + 1 hour
                 try{
-                    redis.set(token, "validSeller", "EX", 1213200)
+                    redis.set(token, "validBuyer", "EX", 1213200)
                     console.log("hello")
                 }
                 catch(err){
@@ -85,7 +86,7 @@ export default async function handle(req: NextApiRequest, res:NextApiResponse){
                 })
                 return
             }
-            prisma.$disconnect()
+            
         break;
 
         default:
@@ -93,31 +94,32 @@ export default async function handle(req: NextApiRequest, res:NextApiResponse){
             res.json({
                 message: "Only POST requests are allowed"
             })
+            return
     }
     /*If no request body provided */
    
 }
 
-async function checkUser(storename:string, password:string): Promise<string | null>{
+async function checkUser(phoneNumber:string, password:string): Promise<string | null>{
     
     //Check database if seller exists
-    const seller = await prisma.seller.findUnique({
+    const user = await prisma.user.findUnique({
         where:{
-            storeName: storename
+            phoneNumber
         },
     })
 
     //If non-existent user return false
-    if(!seller){
+    if(!user){
         return null
     }
-    const match = await bcrypt.compare(password, seller.passwordHash)
+    const match = await bcrypt.compare(password, user.passwordHash)
 
     //If wrong password return false
     if(!match){
         return null
     }
 
-    return seller.id
+    return user.id
 }
 

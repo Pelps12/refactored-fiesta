@@ -10,6 +10,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator client{
-  provider = "prisma-client-js"
+
+model User{
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email String? @unique
+  passwordHash String?
+  phoneNumber String @unique
+  name String
+  profilePic String?
+
+}
+
+model Seller{
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email String? @unique
+  passwordHash String
+  phoneNumber String
+  owner String
+  storeName String @unique
+  location Decimal[]
+  profilePic String?
+  openingTime String
+  closingTime String
+  listings Listing[]
+}
+
+model Product{
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  image String?
+  perishable Boolean
+  name String
+  listings Listing[]
+}
+
+model Listing{
+  id String @id @default(uuid())
+  sellerId String
+  createdAt DateTime @default(now())
+  seller Seller @relation(fields: [sellerId], references: [id])
+  currency String @default("NGN")
+  startingPrice Decimal
+  expiresAt DateTime
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
 }

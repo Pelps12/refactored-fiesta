@@ -1,7 +1,7 @@
 import {NextApiRequest, NextApiResponse}from 'next'
 import DOMPurify from 'isomorphic-dompurify'
 //import Cookies from 'cookies'
-import {  Prisma } from '@prisma/client'
+import {  Prisma} from "@prisma/client"
 import {prisma} from "../../prisma"
 import bcrypt from 'bcrypt'
 import {redis} from "../../redis"
@@ -15,7 +15,6 @@ const saltRounds = 10
 
 
 
-
 /*!!!!!DO NOT FORGET TO CHANGE THIS */
 const KEY = process.env.JWT_SECRET
 console.log(KEY)
@@ -25,7 +24,7 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
             const jwtVal = getCookies(req, 'jwt')
             const loggedIn:string = await checkToken(jwtVal)
             console.log("JWT Value: "+ jwtVal)
-            if(loggedIn === "validSeller"){
+            if(loggedIn === "validBuyer"){
                 res.statusCode= 403,
                 res.json({
                     error: "Already logged in"
@@ -45,22 +44,14 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
             }
             
 
-            let {storename,long, lat, alt, owner, password, startTime, closingTime, email, phoneNumber} = req.body
+            let {name, password, email, phoneNumber} = req.body
 
             //NEVER TRUST THE CLIENT
-            storename = DOMPurify.sanitize(storename)
+            name = DOMPurify.sanitize(name)
             phoneNumber = DOMPurify.sanitize(phoneNumber)
             email = DOMPurify.sanitize(email)
-            long = DOMPurify.sanitize(long)
-            lat = DOMPurify.sanitize(lat)
-            alt = DOMPurify.sanitize(alt)
-            if(!alt){
-                alt = 0.0
-            }
-            owner = DOMPurify.sanitize(owner)
             password = DOMPurify.sanitize(password)
-            startTime = DOMPurify.sanitize(startTime)
-            closingTime = DOMPurify.sanitize(closingTime)
+
             const passwordHash:string = await bcrypt.hash(password, saltRounds)
             console.log(passwordHash)
 
@@ -68,30 +59,26 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
             //Call checkUser
 
             /*If the user already exist in the database */
-            if(!checkSeller(storename)){
+            if(!checkUser(name)){
                 res.statusCode = 409
                 res.json({
                     success: false,
-                    error: "Seller already exists"
+                    error: "User already exists"
                 })
                 return
             }
 
             //PLACEHOLDER FOR DATABASE
-            let seller:Prisma.SellerCreateInput
-            seller = {
+            const user:Prisma.UserCreateInput
+             = {
                 email,
                 passwordHash,
                 phoneNumber,
-                owner,
-                storeName: storename,
-                location: [parseFloat(long), parseFloat(lat), parseFloat(alt)],
-                openingTime:startTime,
-                closingTime
+                name,
             }
             let createSeller: any;
             try{
-                 createSeller = await prisma.seller.create({data: seller})
+                 createSeller = await prisma.user.create({data: user})
             }
             catch(err){
                 res.statusCode = 404
@@ -110,7 +97,7 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
             const token: string = jwt.sign(
                 {
                     id: createSeller.id,
-                    description: Description.Seller
+                    description: Description.Buyer
                 },
                 KEY, {
                     expiresIn: '14d'
@@ -120,7 +107,7 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
             //Set the token as valid in Redis cache
             //Expire it after 14 days + 1 hour
             try{
-                redis.set(token, "validSeller", "EX", 1213200)
+                redis.set(token, "validBuyer", "EX", 1213200)
             }
             catch(err){
                 console.log(err.message)
@@ -151,15 +138,15 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
 }
 
 
-async function checkSeller(storename: string){
-    const seller = await prisma.seller.findUnique({
+async function checkUser(number: string){
+    const user = await prisma.user.findUnique({
         where:{
-            storeName: storename
+            phoneNumber: number
         },
     })
-    console.log(seller)
+    console.log(user)
     //If the storename already exists
-    if(seller){
+    if(user){
         return false
     }
     return true
