@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import Navigation from "./Navigation";
 import MobileNavigation from "./MobileNavigation";
 import Header from "./Header";
+import Link from "next/link";
 
 const Slider = () => {
   return (
@@ -11,8 +12,12 @@ const Slider = () => {
             <div className={sliderStyles.text}>
                 <h1>Headline Text</h1>
                 <p>Paragraph Text</p>
-                <a className={sliderStyles.btn} href="">Register</a>
-                <a className={sliderStyles.btn} href="">Login</a>
+                <Link  href="/register">
+                  <a className={sliderStyles.btn}>Register</a>
+                </Link>
+                <Link  href="/login">
+                  <a className={sliderStyles.btn}>Login</a>
+                </Link>
         </div>
         </div>
   )
