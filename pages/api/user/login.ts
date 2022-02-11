@@ -31,10 +31,10 @@ export default async function handle(req: NextApiRequest, res:NextApiResponse){
             const jwtVal = getCookies(req, 'jwt')
             console.log("JWT Value: "+ jwtVal)
             const id:string = await checkUser(phoneNumber, password)
-            const loggedIn:string = await checkToken(jwtVal)
-            console.log(loggedIn)
+            const valid:string = await checkToken(jwtVal)
+            console.log(valid)
         
-            if(loggedIn === "validBuyer"){
+            if(valid === "validBuyer"){
                 res.statusCode= 403,
                 res.json({
                     error: "Already logged in"

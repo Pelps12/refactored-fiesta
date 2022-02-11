@@ -4,6 +4,8 @@ import Redis from 'ioredis'
 import getCookies from '../../cookies'
 import jwt from 'jsonwebtoken'
 import { checkToken } from '../../token'
+import DOMPurify from 'dompurify'
+import dayjs from 'dayjs'
 
 const redis = new Redis(process.env.REDIS_URL)
 
@@ -34,7 +36,7 @@ export default async function sellerListing(req: NextApiRequest, res: NextApiRes
     }
     const value: string|null = await checkToken(jwtVal)
 
-    if(value === "false"){
+    if(value !== "validSeller"){
         res.statusCode = 403,
         res.json({
             message: "Invalid Token"
@@ -89,5 +91,73 @@ export default async function sellerListing(req: NextApiRequest, res: NextApiRes
                 res.end("Error!")
                 return
             }
+            if(typeof decoded != "string"){
+
+                /*NOTE WHEN YOU CLICK ON A PRODUCT,
+                YOU SHOULD PASS THE PRODUCTID */
+                let {expiresAt, startingPrice, product} = req.body
+                expiresAt = DOMPurify.sanitize(expiresAt)
+                startingPrice = DOMPurify.sanitize(startingPrice)
+                product = DOMPurify.sanitize(product)
+                try{
+                    expiresAt = convertToDateTime(expiresAt)
+                }
+                catch(error){
+                    res.statusCode = 400
+                    message: error.message
+                    return
+                }
+                
+                
+                const newListing:Prisma.ListingCreateInput ={
+                    startingPrice,
+                    expiresAt,
+                    product,
+                    seller: typeof decoded != null ? decoded.id: null
+                }
+                let createListing: any;
+                try{
+                    createListing = await prisma.listing.create({data: newListing})
+                }
+                catch(err){
+                    res.statusCode = 404
+                    res.json({
+                        error: err.message
+                    })
+                    return
+                }
+            }
+        break;
+        case "DELETE":
+            try{
+                await prisma.listing.deleteMany({
+                    where:{
+                        sellerId: typeof decoded != 'string'? decoded.id: null
+                    }
+                })
+            }
+            catch(err){
+                res.statusCode = 400,
+                res.json({
+                    error: err.msg
+                })
+            }
+
+            
     }
+}
+
+function convertToDateTime(expiresAt: string): Date{
+    const regex:RegExp = /^([01]\d|2[0-3]):{1}([0-5]\d)$/
+    const globalRegex:RegExp = new RegExp(regex, 'g')
+    if(!globalRegex.test(expiresAt)){
+        throw "Invalid Format"
+    }
+    const [hours, minutes]:string[] = expiresAt.split(":")
+
+    let time:Date = new Date()
+    time.setMinutes(parseInt(minutes))
+    time.setHours(parseInt(hours))
+    return time
+
 }
