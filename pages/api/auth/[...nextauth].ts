@@ -32,6 +32,7 @@ export default NextAuth({
             token.accessToken = account.access_token
         }
         if(user){
+            token.id = user.id
             if(user?.roles){
                 token.roles = user.roles
             }
@@ -41,10 +42,12 @@ export default NextAuth({
         }
         console.log(token)
 
+
         return token
     },
     async session({session, token, user}){
         session.accessToken = token.accessToken
+        session.id = token.id
         return session
     }
 },
