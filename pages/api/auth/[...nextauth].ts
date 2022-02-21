@@ -18,4 +18,34 @@ export default NextAuth({
   session: {
     strategy: "jwt",
   },
+  callbacks:{
+    async signIn({user}){
+        if(!user?.roles){
+            user.roles = "buyer"
+        }
+        
+        return true
+    },
+    async jwt({token, account, user, profile}){
+        
+        if(account){
+            token.accessToken = account.access_token
+        }
+        if(user){
+            if(user?.roles){
+                token.roles = user.roles
+            }
+            else{
+                token.roles = "buyer"
+            }
+        }
+        console.log(token)
+
+        return token
+    },
+    async session({session, token, user}){
+        session.accessToken = token.accessToken
+        return session
+    }
+},
 });
