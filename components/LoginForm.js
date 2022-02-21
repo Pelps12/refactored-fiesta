@@ -1,27 +1,21 @@
 import formStyle from "../styles/Form.module.css";
+import {getProviders, signIn} from "next-auth/react"
 
-const LoginForm = () => {
+const LoginForm = ({providers}) => {
     
   return (
       <div className={formStyle.wrapper}>
-          <form method="POST" className={formStyle.form} action="/api/login">
-              <div className={formStyle.innerForm}>
-                  <h2>LOGIN</h2>
-             
-       <div className={formStyle.formGroup}>
-           <label htmlFor="email">Email:</label>
-           <input type="text" name="email" id="email" />
-       </div>
-       <div className={formStyle.formGroup}>
-           <label htmlFor="password">Password:</label>
-           <input type="text" name="password" id="password" />
-       </div>
-       <input type="submit" value="LOGIN"  onClick={submitForm}/>
+          {Object.values(providers).map((provider) =>(
+              <div key ={provider.name}>
+                  <button onClick={() => signIn(provider.id, {callbackUrl: "/"})}>
+                      Sign in with {provider.name}
+                  </button>
               </div>
-   </form>
+          ))}
       </div>
    
   )
 }
+
 
 export default LoginForm
