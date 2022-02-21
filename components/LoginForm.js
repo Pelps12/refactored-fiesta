@@ -1,9 +1,10 @@
 import formStyle from "../styles/Form.module.css";
 
 const LoginForm = () => {
+    
   return (
       <div className={formStyle.wrapper}>
-          <form className={formStyle.form} action="">
+          <form method="POST" className={formStyle.form} action="/api/login">
               <div className={formStyle.innerForm}>
                   <h2>LOGIN</h2>
              
@@ -15,7 +16,7 @@ const LoginForm = () => {
            <label htmlFor="password">Password:</label>
            <input type="text" name="password" id="password" />
        </div>
-       <input type="submit" value="LOGIN" />
+       <input type="submit" value="LOGIN"  onClick={submitForm}/>
               </div>
    </form>
       </div>
