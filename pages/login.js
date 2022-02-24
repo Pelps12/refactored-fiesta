@@ -1,5 +1,5 @@
 import LoginForm from "../components/LoginForm";
-import {getProviders} from "next-auth/react"
+import {getCsrfToken, getProviders} from "next-auth/react"
 
 const Login = ({providers}) => {
     console.log(providers)
@@ -11,8 +11,10 @@ const Login = ({providers}) => {
 export async function getServerSideProps(context){
     const providers = await getProviders()
     console.log("Hello")
+    console.log(providers)
     return {
-        props:{providers},
+        props:{providers, csrfToken: await getCsrfToken(context)},
+        
     }
 }
  

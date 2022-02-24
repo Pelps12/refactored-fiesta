@@ -1,13 +1,16 @@
 import {NextApiRequest, NextApiResponse}from 'next'
 import DOMPurify from 'isomorphic-dompurify'
-//import Cookies from 'cookies'
+import {connectToDatabase} from "../../../util/mongodb"
 import {  Prisma } from '@prisma/client'
+import {getSession} from "next-auth/react"
+import {getToken} from "next-auth/jwt"
 import {prisma} from "../../prisma"
-import bcrypt from 'bcrypt'
+import fetch from "node-fetch"
 import {redis} from "../../redis"
 import jwt from 'jsonwebtoken'
 import { checkToken } from '../token'
 import getCookies from '../cookies'
+import { ObjectId } from 'mongodb'
 
 //SALT FOR PASSWORD HASH
 const saltRounds = 10
@@ -22,127 +25,124 @@ console.log(KEY)
 export default async function sellerReg(req: NextApiRequest, res:NextApiResponse){
     switch(req.method){
         case "POST":
-            const jwtVal = getCookies(req, 'jwt')
-            const loggedIn:string = await checkToken(jwtVal)
-            console.log("JWT Value: "+ jwtVal)
-            if(loggedIn === "validSeller"){
-                res.statusCode= 403,
-                res.json({
-                    error: "Already logged in"
-                })
-                return
-            }
+            const session:any = await getSession({req})
+            const token = await getToken({req})
+            const {db} = await connectToDatabase();
+            console.log(token.roles)
+            if(token.roles === "seller"){
+                /*If no request body provided */
+                if(!req.body){
+                    res.statusCode = 404
+                    res.json({
+                        success: false
+                    })
+                    res.end("Error!")
+                    return
+                }
+                
+
+                let {storename,long, lat, alt, startTime, closingTime, accountBank, accountNumber} = req.body
+
+                //NEVER TRUST THE CLIENT
+                storename = DOMPurify.sanitize(storename)
+                long = DOMPurify.sanitize(long)
+                lat = DOMPurify.sanitize(lat)
+                alt = DOMPurify.sanitize(alt)
+                if(!alt){
+                    alt = 0.0
+                }
+                accountBank = DOMPurify.sanitize(accountBank)
+                accountNumber = DOMPurify.sanitize(accountNumber)
+                startTime = DOMPurify.sanitize(startTime)
+                closingTime = DOMPurify.sanitize(closingTime)
+
+                /*Search for user */
+                //Call checkUser
+                
+
+                /*If the user already exist in the database */
+                if(! await checkSeller(storename, db)){
+                    res.statusCode = 409
+                    res.json({
+                        success: false,
+                        error: "Seller already exists"
+                    })
+                    return
+                }
+
+                //PLACEHOLDER FOR DATABASE
+                
+                let createSeller: any;
+                try{
+                    console.log(`Session ID: ${session.id}`)
+                    const result = await db.collection("users").findOneAndUpdate({"_id": ObjectId(session.id)}, 
+                        {$set: {"storename": storename, 
+                                "location": [parseFloat(long), parseFloat(lat), parseFloat(alt)],
+                                "startingTime": startTime,
+                                "closingTime": closingTime,
+                                "roles": "seller",
+                                "accountBank": accountBank,
+                                "accountNumber": accountNumber,}})
+                    if(result.matchedCount < 1){
+                        return res.status(409).json({
+                            success: false,
+                            error: "User does not exist"
+                        })
+                        
+                    }
+                    //Call flutterwave
+                    const flRes = await fetch('https://api.flutterwave.com/v3/subaccounts', {
+                        method: "POST",
+                        body: JSON.stringify({
+                            account_bank: accountBank,
+                            account_number: accountNumber,
+                            business_name: storename,
+                            business_mobile: result.phoneNumber,
+                            business_email: result.email ?? "oluwapelps@gmail.com",
+                            country: "NG",
+                            split_type: "percentage",
+                            split_value: 0.016,
+                        }),
+                        headers: {'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${process.env.PAYMENT_TOKEN}`
+                                }
+                    })
+                    const flData:any = await flRes.json()
+                    console.log(result)
+                    if(flData.status === "success"){
+                        const addSellerId = await db.collection("users").findOneAndUpdate({"_id": ObjectId(session.id)}, 
+                        {$set: {"sellerId": flData.data.id,
+                                "subaccount_id": flData.data.subaccount_id}})
+                        return res.status(201).json({result})
+                    }else{
+                        return res.status(500).json({error: "Immediately contact developers"})
+                    }
+                    
+                }
+                catch(err){
+                     return res.status(404).json({
+                        error: err.message
+                    })
+                    //console.log(err.message)
+                }
+                
 
 
-            /*If no request body provided */
-            if(!req.body){
-                res.statusCode = 404
-                res.json({
-                    success: false
+                /*If successful, return a JWT */
+
+                res.status(201).json({
+                    success: true,                    
                 })
-                res.end("Error!")
-                return
             }
+            else{
+                res.status(403).json({error: "Forbidden"})
+            }
+
             
-
-            let {storename,long, lat, alt, owner, password, startTime, closingTime, email, phoneNumber} = req.body
-
-            //NEVER TRUST THE CLIENT
-            storename = DOMPurify.sanitize(storename)
-            phoneNumber = DOMPurify.sanitize(phoneNumber)
-            email = DOMPurify.sanitize(email)
-            long = DOMPurify.sanitize(long)
-            lat = DOMPurify.sanitize(lat)
-            alt = DOMPurify.sanitize(alt)
-            if(!alt){
-                alt = 0.0
-            }
-            owner = DOMPurify.sanitize(owner)
-            password = DOMPurify.sanitize(password)
-            startTime = DOMPurify.sanitize(startTime)
-            closingTime = DOMPurify.sanitize(closingTime)
-            const passwordHash:string = await bcrypt.hash(password, saltRounds)
-            console.log(passwordHash)
-
-            /*Search for user */
-            //Call checkUser
-
-            /*If the user already exist in the database */
-            if(!checkSeller(storename)){
-                res.statusCode = 409
-                res.json({
-                    success: false,
-                    error: "Seller already exists"
-                })
-                return
-            }
-
-            //PLACEHOLDER FOR DATABASE
-            let seller:Prisma.SellerCreateInput
-            seller = {
-                email,
-                passwordHash,
-                phoneNumber,
-                owner,
-                storeName: storename,
-                location: [parseFloat(long), parseFloat(lat), parseFloat(alt)],
-                openingTime:startTime,
-                closingTime
-            }
-            let createSeller: any;
-            try{
-                 createSeller = await prisma.seller.create({data: seller})
-            }
-            catch(err){
-                res.statusCode = 404
-                res.json({
-                    error: err.message
-                })
-                return
-                //console.log(err.message)
-            }
-            
-
-            enum Description {
-                Seller = "Seller",
-                Buyer = "Buyer"
-            }
-            const token: string = jwt.sign(
-                {
-                    id: createSeller.id,
-                    description: Description.Seller
-                },
-                KEY, {
-                    expiresIn: '14d'
-                })
-
-            
-            //Set the token as valid in Redis cache
-            //Expire it after 14 days + 1 hour
-            try{
-                redis.set(token, "validSeller", "EX", 1213200)
-            }
-            catch(err){
-                console.log(err.message)
-            }
-
-
-            /*If successful, return a JWT */
-
-            res.json({
-                success: true,
-                token: token
-            })
-            try{
-                redis.disconnect()
-            }
-            catch(err){
-                console.log(err.message)
-            }
+           
             break;
             default:
-                res.statusCode = 405
-                res.json({
+                res.status(405).json({
                     message: "Only POST requests are allowed"
                 })
     }
@@ -151,16 +151,13 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
 }
 
 
-async function checkSeller(storename: string){
-    const seller = await prisma.seller.findUnique({
-        where:{
-            storeName: storename
-        },
-    })
-    console.log(seller)
+async function checkSeller(storename: string, db:any){
+    const user = await db.collection("users").findOne({storename: storename})
+    console.log("User: " +user)
     //If the storename already exists
-    if(seller){
+    if(user){
         return false
     }
+    console.log("False")
     return true
 }
