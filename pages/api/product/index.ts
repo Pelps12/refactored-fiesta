@@ -1,7 +1,6 @@
 import {NextApiRequest, NextApiResponse}from 'next'
 import { getToken } from 'next-auth/jwt';
 import { connectToDatabase } from '../../../util/mongodb';
-import {prisma} from "../../prisma"
 
 
 export default async function(req:NextApiRequest, res:NextApiResponse){
