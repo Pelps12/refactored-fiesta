@@ -6,8 +6,6 @@ import {prisma} from "../../prisma"
 import bcrypt from 'bcrypt'
 import {redis} from "../../redis"
 import jwt from 'jsonwebtoken'
-import { checkToken } from '../token'
-import getCookies from '../cookies'
 import {connectToDatabase} from "../../../util/mongodb"
 
 //SALT FOR PASSWORD HASH

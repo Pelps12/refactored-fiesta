@@ -1,15 +1,9 @@
 import {NextApiRequest, NextApiResponse}from 'next'
 import DOMPurify from 'isomorphic-dompurify'
 import {connectToDatabase} from "../../../util/mongodb"
-import {  Prisma } from '@prisma/client'
 import {getSession} from "next-auth/react"
 import {getToken} from "next-auth/jwt"
-import {prisma} from "../../prisma"
 import fetch from "node-fetch"
-import {redis} from "../../redis"
-import jwt from 'jsonwebtoken'
-import { checkToken } from '../token'
-import getCookies from '../cookies'
 import { ObjectId } from 'mongodb'
 
 //SALT FOR PASSWORD HASH
@@ -29,7 +23,7 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
             const token = await getToken({req})
             const {db} = await connectToDatabase();
             console.log(token.roles)
-            if(token.roles === "seller"){
+            if(token.roles === "buyer"){
                 /*If no request body provided */
                 if(!req.body){
                     res.statusCode = 404
@@ -75,14 +69,7 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                 let createSeller: any;
                 try{
                     console.log(`Session ID: ${session.id}`)
-                    const result = await db.collection("users").findOneAndUpdate({"_id": ObjectId(session.id)}, 
-                        {$set: {"storename": storename, 
-                                "location": [parseFloat(long), parseFloat(lat), parseFloat(alt)],
-                                "startingTime": startTime,
-                                "closingTime": closingTime,
-                                "roles": "seller",
-                                "accountBank": accountBank,
-                                "accountNumber": accountNumber,}})
+                    const result = await db.collection("users").findOne({"_id": ObjectId(session.id)})
                     if(result.matchedCount < 1){
                         return res.status(409).json({
                             success: false,
@@ -110,8 +97,15 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                     const flData:any = await flRes.json()
                     console.log(result)
                     if(flData.status === "success"){
-                        const addSellerId = await db.collection("users").findOneAndUpdate({"_id": ObjectId(session.id)}, 
-                        {$set: {"sellerId": flData.data.id,
+                        const addSellerId = await db.collection("users").findOneAndUpdate({"_id": ObjectId(session.id)},
+                        {$set: {"storename": storename, 
+                                "location": [parseFloat(long), parseFloat(lat), parseFloat(alt)],
+                                "startingTime": startTime,
+                                "closingTime": closingTime,
+                                "roles": "seller",
+                                "accountBank": accountBank,
+                                "accountNumber": accountNumber, 
+                                "sellerId": flData.data.id,
                                 "subaccount_id": flData.data.subaccount_id}})
                         return res.status(201).json({result})
                     }else{
@@ -134,8 +128,11 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                     success: true,                    
                 })
             }
+            else if(token?.roles === "seller"){
+                res.status(403).json({error: "Already a seller"})
+            }
             else{
-                res.status(403).json({error: "Forbidden"})
+                res.status(403).json({error: "Already a seller"})
             }
 
             

@@ -5,6 +5,7 @@ import clientPromise from "../../../lib/mongodb";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDatabase } from "../../../util/mongodb";
 
+
 export default NextAuth({
     
   // Configure one or more authentication providers
