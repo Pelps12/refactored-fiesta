@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb'
 import {NextApiRequest, NextApiResponse}from 'next'
 import { getToken } from 'next-auth/jwt'
 import { getSession } from 'next-auth/react'
+import clientPromise from '../../../lib/mongodb'
 import { connectToDatabase } from '../../../util/mongodb'
 import {prisma} from "../../prisma"
 
@@ -14,7 +15,8 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse){
     console.log(id)
     const url:URL = new URL(req.url, `http://${req.headers.host}`)
     const area:string = url.searchParams.get('area')
-    const {db} = await connectToDatabase()
+    const client = await clientPromise;
+    const db = client.db(process.env.MONGODB_DB)
     switch(req.method){
         case "GET":
             console.log(` Line 20 Please Work: ${JSON.stringify(await getToken({req}))}`)

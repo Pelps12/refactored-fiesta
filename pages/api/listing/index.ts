@@ -1,22 +1,24 @@
 import {NextApiRequest, NextApiResponse}from 'next'
-import {connectToDatabase, disconnect} from "../../../util/mongodb"
+import clientPromise from "../../../lib/mongodb"
 import {getSession} from "next-auth/react"
-import DOMPurify from 'isomorphic-dompurify'
 import { getToken } from 'next-auth/jwt'
+import DOMPurify from 'isomorphic-dompurify'
 import { ObjectId } from 'mongodb'
 
 
 export default async function(req:NextApiRequest, res:NextApiResponse){
     
     const url:URL = new URL(req.url, `http://${req.headers.host}`)
-    //const session:any = await getSession({req})
+    const token:any = await getToken({req})
     const product:string = url.searchParams.get('product')
     const sellerQ:string = url.searchParams.get('seller')
     const area:string = url.searchParams.get("area")
-    const {db, client} = await connectToDatabase();
+    const client = await clientPromise;
+    const db = client.db(process.env.MONGODB_DB)
     switch(req.method){
         case "GET":
             try{
+                
                 let listings:any
                 console.log(sellerQ, product)
                 console.log(area)
@@ -24,7 +26,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                 const page_no:number = parseInt(url.searchParams.get("page"))
                 const offset:number = per_page *(page_no - 1)
                 const query = {...(sellerQ && {seller: ObjectId(sellerQ)}),
-                            ...(product && {productId: ObjectId(product)}),
+                            ...(product && {productId: product === "mine" ?  ObjectId(token.id) :  ObjectId(product)}),
                             ...(area && {area: area})}
                 console.log(query)
                 listings = await db
@@ -36,11 +38,17 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                     //console.log("Hello");
                 
                 
-                //console.log("Listings: "+listings)
-            res.status(200).json({status: "success", "listings":listings, ...(page_no && {"page": page_no})})
-            disconnect(client)
+                console.log("Listings: "+listings)
+                if(listings){
+                    res.status(200).json({status: "success", "listings":listings, ...(page_no && {"page": page_no})})
+                }
+                else{
+                    res.status(404).json({status: "success", "listings":listings, ...(page_no && {"page": page_no})})
+                }
+            
+            
             }catch(error){
-                res.status(500).json(error)
+                res.status(500).json(error.message)
             }
         break;
         case "POST":

@@ -81,9 +81,9 @@ const RegisterForm = ({providers}) => {
     }
   return (
     <div className={formStyle.wrapper}>
-        {Object.values(providers).map((provider) =>(
+        {Object.values(providers).filter(provider =>provider.name != "Credentials").map((provider) =>(
                 <div className={formStyle.formGroup} key ={provider.name}>
-                    <button onClick={() => signIn(provider.id, {callbackUrl: "/"})}>
+                    <button onClick={() => signIn(provider.id, {callbackUrl: "/home"})}>
                         Register with {provider.name}
                     </button>
                 </div>

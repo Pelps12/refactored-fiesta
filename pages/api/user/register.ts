@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt'
 import {redis} from "../../redis"
 import jwt from 'jsonwebtoken'
 import {connectToDatabase} from "../../../util/mongodb"
+import clientPromise from '../../../lib/mongodb'
 
 //SALT FOR PASSWORD HASH
 const saltRounds = 10
@@ -20,7 +21,8 @@ console.log(KEY)
 export default async function sellerReg(req: NextApiRequest, res:NextApiResponse){
     switch(req.method){
         case "POST":
-            const {db} = await connectToDatabase();
+            const client = await clientPromise;
+            const db = client.db(process.env.MONGODB_DB)
             const session:any = await getSession({req})
             if(session){
                 res.status(403).json({error: "Already logged in"})

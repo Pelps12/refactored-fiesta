@@ -5,6 +5,7 @@ import {getSession} from "next-auth/react"
 import {getToken} from "next-auth/jwt"
 import fetch from "node-fetch"
 import { ObjectId } from 'mongodb'
+import clientPromise from '../../../lib/mongodb'
 
 //SALT FOR PASSWORD HASH
 const saltRounds = 10
@@ -21,7 +22,8 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
         case "POST":
             const session:any = await getSession({req})
             const token = await getToken({req})
-            const {db} = await connectToDatabase();
+            const client = await clientPromise;
+            const db = client.db(process.env.MONGODB_DB)
             console.log(token.roles)
             if(token.roles === "buyer"){
                 /*If no request body provided */
