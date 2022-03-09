@@ -1,28 +1,42 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import fetch from "node-fetch";
-import {getToken} from "next-auth/jwt"
+import DOMPurify from 'isomorphic-dompurify'
+import {getToken, JWT} from "next-auth/jwt"
 import { connectToDatabase } from "../../../util/mongodb";
 import {ObjectId} from "mongodb"
 import {v4 as uuidv4} from "uuid"
+import clientPromise from "../../../lib/mongodb";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse){
-    const session = await getToken({req})
+    console.log()
+    const session: JWT = await getToken({req})
+    const referrer = req.query['referrer']
     console.log(session.id)
 //POST ONLY
     if(session){
-        const {amount, listingId} = req.body
-        const {db} = await connectToDatabase();
+        let {amount, listingId} = req.body
+        amount = DOMPurify.sanitize(amount)
+        listingId = DOMPurify.sanitize(listingId)
+        const client = await clientPromise;
+        const db = client.db(process.env.MONGODB_DB)
 
 
         //I feel like a sinner
         const user = await db.collection("users").findOne({ _id: ObjectId(session.id)})
         const listing = await db.collection("listings").findOne({_id: ObjectId(listingId)})
-        console.log(JSON.stringify(listing));
+        console.log(user);
+        if(!listing){
+            return res.status(404).json({error: "Listing does not exist"})
+        }
         const seller = await db.collection("users").findOne({_id: ObjectId(listing.seller)})
+        console.log(seller);
+        console.log(listing);
+        
         //console.log(JSON.stringify(seller))
-        if(user){
+        if(user && listing && seller){
             const amountFloat = parseFloat(amount)
+            console.log(amountFloat)
             const extraFee = amountFloat >= 10000 ? 50 :0
             const percentage = (0.97* amountFloat)/(amountFloat - extraFee)
             console.log(percentage)
@@ -35,11 +49,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     },
                     body: JSON.stringify({
                         tx_ref: `laslas-tx-${uuidv4()}`,
-                        amount: amountFloat,
+                        amount: amount,
                         currency: "NGN",
-                        redirect_url: "http://localhost:3000/home",
+                        redirect_url: referrer ?? "http://localhost:3000/home",
                         meta: {
-                            consumer_id: session.id,
+                            consumer_id: session.id
                         },
                         customer: {
                             email: user.email,
@@ -56,12 +70,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                             title: "Las-Las",
                             logo: "https://ucarecdn.com/8f2cf812-203e-48af-8c69-b10f3595974b/download.jpg"
                         }
+                        
                     })
                 })
                 const data:any = await response.json()
                 res.status(200).json(data)
             }catch(err){
-                res.status(500).json(err)
+                res.status(500).json(err.message)
             }
             
         

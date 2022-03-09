@@ -2,7 +2,7 @@ import {getToken} from "next-auth/jwt"
 import {NextResponse, NextRequest} from "next/server"
 
 export async function middleware(req:any){
-    console.log(req)
+    //console.log(req)
     const session = await getToken({req})
     if(req.nextUrl.pathname.includes("/login") || 
     req.nextUrl.pathname.includes("/register") &&
@@ -15,6 +15,11 @@ export async function middleware(req:any){
     if(req.nextUrl.pathname.includes("/home")){
         if(!session){
             return NextResponse.redirect("/")
+        }
+    }
+    if(req.nextUrl.pathname === "/"){
+        if(session){
+            return NextResponse.redirect("/home")
         }
     }
 }

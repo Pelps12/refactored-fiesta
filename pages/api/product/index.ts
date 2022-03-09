@@ -1,5 +1,6 @@
 import {NextApiRequest, NextApiResponse}from 'next'
 import { getToken } from 'next-auth/jwt';
+import clientPromise from '../../../lib/mongodb';
 import { connectToDatabase } from '../../../util/mongodb';
 
 
@@ -7,7 +8,8 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
     const url:URL = new URL(req.url, `http://${req.headers.host}`)
     const category:string = url.searchParams.get('category')
     //const limit = parseInt(url.searchParams.get('limit'))
-    const {db} = await connectToDatabase();
+    const client = await clientPromise;
+    const db = client.db(process.env.MONGODB_DB)
 
     switch(req.method){
         case "GET":
