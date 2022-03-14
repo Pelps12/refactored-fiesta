@@ -6,7 +6,8 @@ import { connectToDatabase } from "../../../util/mongodb";
 import {ObjectId} from "mongodb"
 import {v4 as uuidv4} from "uuid"
 import clientPromise from "../../../lib/mongodb";
-
+var parser = require("ua-parser-js")
+var Mixpanel = require('mixpanel');
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse){
     console.log()
@@ -15,9 +16,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log(session.id)
 //POST ONLY
     if(session){
-        let {amount, listingId} = req.body
+        let {amount, listingId, bargain} = req.body
         amount = DOMPurify.sanitize(amount)
         listingId = DOMPurify.sanitize(listingId)
+        bargain =DOMPurify.sanitize(bargain)
         const client = await clientPromise;
         const db = client.db(process.env.MONGODB_DB)
 
@@ -36,10 +38,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         //console.log(JSON.stringify(seller))
         if(user && listing && seller){
             const amountFloat = parseFloat(amount)
+            var ua = parser(req.headers["user-agent"])
+            console.log(ua)
+            var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            console.log(ip)
             console.log(amountFloat)
-            const extraFee = amountFloat >= 10000 ? 50 :0
-            const percentage = (0.97* amountFloat)/(amountFloat - extraFee)
-            console.log(percentage)
+            const seller_portion = 0.97* amountFloat;
+            console.log(seller_portion);
             try{
                 const response = await fetch("https://api.flutterwave.com/v3/payments", {
                     method: "POST",
@@ -53,7 +58,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         currency: "NGN",
                         redirect_url: referrer ?? "http://localhost:3000/home",
                         meta: {
-                            consumer_id: session.id
+                            consumer_id: `${session.id}` ,
+                            seller_id: `${seller._id}`,
+                            ip: ip,
+                             os:ua.os.name || "N/A",
+                            browser: ua.browser.name || "N/A",
+                            browser_version: ua.browser.major || "N/A",
+                            bargain: bargain
                         },
                         customer: {
                             email: user.email,
@@ -63,7 +74,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         subaccounts:[
                             {
                                 id: seller.subaccount_id,
-                                transaction_charge: percentage
+                                transaction_charge_type: "flate-subaccount",
+                                transaction_charge: seller_portion
                             }
                         ],
                         customizations: {
@@ -75,6 +87,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 })
                 const data:any = await response.json()
                 res.status(200).json(data)
+
+                var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
+                mixpanel.track("logged in", {
+                    distinct_id: session?.id ?? uuidv4(),
+                    $insert_id: uuidv4(),
+                    ip: ip,
+                    $os: ua.os.name,
+                    $browser: ua.browser.name,
+                    $browser_version: ua.browser.major,
+
+                })
             }catch(err){
                 res.status(500).json(err.message)
             }

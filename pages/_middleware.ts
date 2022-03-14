@@ -22,4 +22,5 @@ export async function middleware(req:any){
             return NextResponse.redirect("/home")
         }
     }
+    
 }

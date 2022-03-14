@@ -9,3 +9,8 @@ export default function Home() {
     <Slider/>
   )
 }
+
+export async function getServerSideProps(context){
+  console.log(context.req.headers)
+  return{ props:{}}
+}

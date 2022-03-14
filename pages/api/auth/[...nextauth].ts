@@ -5,6 +5,9 @@ import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "../../../lib/mongodb";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDatabase } from "../../../util/mongodb";
+var Mixpanel = require('mixpanel');
+import {v4 as uuidv4} from "uuid"
+
 
 
 export default NextAuth({
@@ -72,6 +75,8 @@ export default NextAuth({
             console.log("User" + user);
             user.roles = "buyer"
         }
+        //console.log(user.id)
+
         
         return true
     },
@@ -91,7 +96,7 @@ export default NextAuth({
                 token.roles = "buyer"
             }
         }
-        console.log(token)
+        //console.log(token)
 
 
         return token
@@ -99,7 +104,7 @@ export default NextAuth({
     async session({session, token, user}){
         session.accessToken = token.accessToken
         session.id = token.id
-        console.log(session)
+        //console.log(session)
         return session
     }
 },
