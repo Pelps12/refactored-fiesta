@@ -5,12 +5,11 @@ import { getToken } from 'next-auth/jwt'
 import { getSession } from 'next-auth/react'
 import clientPromise from '../../../lib/mongodb'
 import { connectToDatabase } from '../../../util/mongodb'
-import {prisma} from "../../prisma"
 
 
 //Get sellers selling Product id in location
 export default async function handler(req:NextApiRequest, res:NextApiResponse){
-    const {id} = req.query
+    const {id}: any = req.query
     
     console.log(id)
     const url:URL = new URL(req.url, `http://${req.headers.host}`)
@@ -23,13 +22,13 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse){
            try{
             const product = await db
             .collection("products")
-            .find({_id: ObjectId(id)})
+            .find({_id: new ObjectId(id)})
             .toArray();
             console.log(product)
             
             const listings = await db
             .collection("listings")
-            .find({productId: ObjectId(id), ...(area && {area: area})})
+            .find({productId: new ObjectId(id), ...(area && {area: area})})
             .toArray();
             return res.status(200).json({product: product[0], listings: listings})
              
@@ -47,7 +46,7 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse){
             if(token?.roles === "admin"){
                 const product = await db
                 .collection("products")
-                .deleteOne({_id: ObjectId(id)})
+                .deleteOne({_id: new ObjectId(id)})
                 return res.status(200).json(product)
             }
         default:

@@ -66,7 +66,7 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                 let createSeller: any;
                 try{
                     console.log(`Session ID: ${session.id}`)
-                    const result = await db.collection("users").findOne({"_id": ObjectId(session.id)})
+                    const result = await db.collection("users").findOne({"_id": new ObjectId(session.id)})
                     console.log(result);
                     if(result.matchedCount < 1){
                         return res.status(409).json({
@@ -100,7 +100,7 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                     const google_res:any = await response.json()
                     console.log(google_res);
                     if(flData.status === "success"){
-                        const addSellerId = await db.collection("users").findOneAndUpdate({"_id": ObjectId(session.id)},
+                        const addSellerId = await db.collection("users").findOneAndUpdate({"_id": new ObjectId(session.id)},
                         {$set: {"storename": storename, 
                                 "location": {
                                     "type": "Point",

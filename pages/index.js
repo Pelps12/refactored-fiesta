@@ -10,7 +10,3 @@ export default function Home() {
   )
 }
 
-export async function getServerSideProps(context){
-  console.log(context.req.headers)
-  return{ props:{}}
-}

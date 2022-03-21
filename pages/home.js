@@ -6,22 +6,19 @@ const Home = ({origin}) => {
     console.log(origin);
     
     
-    useEffect(async () =>{
-        
+    
+    useEffect(() => async () =>{
+        //Test localization        
         if(origin === "cross-site"){
-            console.log("Heyo");
             const session = await getSession();
-            console.log(session);
             MixPanelTracking.getInstance().loggedIn(session);
-        }       
+        }
+               
       }, [])
     return ( <h1>DASHBOARD</h1> );
 }
 
 export async function getServerSideProps(context){
-    console.log(context.req.headers["sec-fetch-site"])
-    const sess = await getSession(context)
-   console.log(sess);
     return {
         props:{
                 origin: context.req.headers["sec-fetch-site"]

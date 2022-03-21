@@ -2,12 +2,10 @@ import {NextApiRequest, NextApiResponse}from 'next'
 import clientPromise from "../../../lib/mongodb"
 import {getSession} from "next-auth/react"
 import { getToken } from 'next-auth/jwt'
-import DOMPurify from 'isomorphic-dompurify'
 import { ObjectId } from 'mongodb'
 var parser = require("ua-parser-js")
 var Mixpanel = require('mixpanel');
 
-import {encode} from "js-base64"
 import {v4 as uuidv4} from "uuid"
 
 
@@ -41,8 +39,8 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                             return res.status(400).json({error: "Please include per_page, page_no, and start queries"})
                         }
                         const offset:number = per_page *(page_no - 1)
-                        const query = {$and: [{$or:[{sender:ObjectId(seller), receiver: ObjectId(session.id)},
-                                            {sender:ObjectId(session.id), receiver: ObjectId(seller)}]}, 
+                        const query = {$and: [{$or:[{sender:new ObjectId(seller), receiver: new ObjectId(session.id)},
+                                            {sender:new ObjectId(session.id), receiver: new ObjectId(seller)}]}, 
                                             {createdAt: {$lt: new Date(start)}}]}
                         console.log(query)
                         messages = await db
