@@ -12,8 +12,9 @@ export async function getServerSideProps(context){
     const providers = await getProviders()
     console.log("Hello")
     console.log(providers)
+    const test = await getCsrfToken(context)
     return {
-        props:{providers, csrfToken: await getCsrfToken(context)},
+        props:{providers},
         
     }
 }

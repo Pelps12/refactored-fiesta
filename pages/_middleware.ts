@@ -13,6 +13,7 @@ export async function middleware(req:any){
         if(session) return NextResponse.redirect("/home")
     }
     if(req.nextUrl.pathname.includes("/home")){
+            console.log(req.headers)
         if(!session){
             return NextResponse.redirect("/")
         }
@@ -22,4 +23,5 @@ export async function middleware(req:any){
             return NextResponse.redirect("/home")
         }
     }
+    
 }

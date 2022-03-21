@@ -1,18 +1,13 @@
 import {NextApiRequest, NextApiResponse}from 'next'
 import DOMPurify from 'isomorphic-dompurify'
-import {connectToDatabase} from "../../../util/mongodb"
 import {getSession} from "next-auth/react"
 import {getToken} from "next-auth/jwt"
 import fetch from "node-fetch"
-import { ObjectId } from 'mongodb'
+import { Long, ObjectId } from 'mongodb'
 import clientPromise from '../../../lib/mongodb'
-
-//SALT FOR PASSWORD HASH
-const saltRounds = 10
-
-
-
-
+var parser = require("ua-parser-js")
+var Mixpanel = require('mixpanel');
+import {v4 as uuidv4} from "uuid"
 
 /*!!!!!DO NOT FORGET TO CHANGE THIS */
 const KEY = process.env.JWT_SECRET
@@ -20,6 +15,10 @@ console.log(KEY)
 export default async function sellerReg(req: NextApiRequest, res:NextApiResponse){
     switch(req.method){
         case "POST":
+            var ua = parser(req.headers["user-agent"])
+            console.log(ua)
+            var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            console.log(ip)
             const session:any = await getSession({req})
             const token = await getToken({req})
             const client = await clientPromise;
@@ -37,16 +36,12 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                 }
                 
 
-                let {storename,long, lat, alt, startTime, closingTime, accountBank, accountNumber} = req.body
-
+                let {storename,long, lat, startTime, closingTime, accountBank, accountNumber} = req.body
+                console.log(req.body);
                 //NEVER TRUST THE CLIENT
                 storename = DOMPurify.sanitize(storename)
                 long = DOMPurify.sanitize(long)
                 lat = DOMPurify.sanitize(lat)
-                alt = DOMPurify.sanitize(alt)
-                if(!alt){
-                    alt = 0.0
-                }
                 accountBank = DOMPurify.sanitize(accountBank)
                 accountNumber = DOMPurify.sanitize(accountNumber)
                 startTime = DOMPurify.sanitize(startTime)
@@ -71,7 +66,8 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                 let createSeller: any;
                 try{
                     console.log(`Session ID: ${session.id}`)
-                    const result = await db.collection("users").findOne({"_id": ObjectId(session.id)})
+                    const result = await db.collection("users").findOne({"_id": new ObjectId(session.id)})
+                    console.log(result);
                     if(result.matchedCount < 1){
                         return res.status(409).json({
                             success: false,
@@ -96,20 +92,40 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                                     'Authorization': `Bearer ${process.env.PAYMENT_TOKEN}`
                                 }
                     })
+                    console.log(flRes);
                     const flData:any = await flRes.json()
-                    console.log(result)
+                    console.log(flData)
+                    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?result_type=neighborhood&key=${process.env.GOOGLE_MAPS_SECRET}&latlng=${lat},${long}`);
+                    console.log(response);
+                    const google_res:any = await response.json()
+                    console.log(google_res);
                     if(flData.status === "success"){
-                        const addSellerId = await db.collection("users").findOneAndUpdate({"_id": ObjectId(session.id)},
+                        const addSellerId = await db.collection("users").findOneAndUpdate({"_id": new ObjectId(session.id)},
                         {$set: {"storename": storename, 
-                                "location": [parseFloat(long), parseFloat(lat), parseFloat(alt)],
+                                "location": {
+                                    "type": "Point",
+                                    "coordinates": [parseFloat(long), parseFloat(lat)]
+                                },
                                 "startingTime": startTime,
                                 "closingTime": closingTime,
                                 "roles": "seller",
                                 "accountBank": accountBank,
                                 "accountNumber": accountNumber, 
                                 "sellerId": flData.data.id,
-                                "subaccount_id": flData.data.subaccount_id}})
-                        return res.status(201).json({result})
+                                "subaccount_id": flData.data.subaccount_id,
+                                "area": google_res.results[0]?.address_components[0]?.long_name}})
+                        res.status(201).json({addSellerId})
+                        var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
+                        mixpanel.track("seller created", {
+                            distinct_id: session?.id ?? uuidv4(),
+                            $insert_id: uuidv4(),
+                            ip: ip,
+                            $os: ua.os.name,
+                            $browser: ua.browser.name,
+                            $browser_version: ua.browser.major,
+
+                        })
+                        return
                     }else{
                         return res.status(500).json({error: "Immediately contact developers"})
                     }
