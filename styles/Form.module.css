@@ -1,10 +1,10 @@
-.form input, .form button{
+.wrapper input, .wrapper button{
     appearance: none;
     background: none;
     border: none;
     outline: none;
 }
-.wrapper{
+/* .wrapper{
     height: 100vh;
     display: flex;
     align-items: center;
@@ -12,14 +12,14 @@
    background-color: #E9ECEF;
     width: 100%;
     font-family: 'Epilogue';
-}
+} */
 
-.form{
+.wrapper{
     display: block;
     position: relative;
 }
 
-.form:after{
+.wrapper:after{
     content: '';
     display: block;
     position: absolute;
@@ -66,7 +66,7 @@
 
 }
 
-.form .innerForm .formGroup input{
+.wrapper .innerForm .formGroup input{
     display: block;
     width: 100%;
     padding: 10px 15px;
@@ -75,11 +75,11 @@
     transition: 0.4s;
 }
 
-.form .innerForm .formGroup input:focus{
+.wrapper .innerForm .formGroup input:focus{
     box-shadow: 0px 0px 3px rgba(0,0,0,0.2);
 }
 
-.form .innerForm input[type="submit"]{
+.wrapper .innerForm input[type="submit"]{
     display: inline-block;
     padding: 10px 15px;
     border-radius: 8px;
@@ -93,7 +93,7 @@
 
 }
 
-.form .innerForm input[type="submit"]:hover{
+.wrapper .innerForm input[type="submit"]:hover{
     background-position: 100% 0%;
 
 }

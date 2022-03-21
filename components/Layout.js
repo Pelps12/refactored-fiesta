@@ -8,13 +8,14 @@ import SecondHeader from "./SecondHeader";
 
 
 
+
 const Layout = ( { children } ) => {
   const router = useRouter();
   const showHeader = router.pathname === "/" ? false : true;
   return (
     <>
     
-    {showHeader && <SecondHeader />}
+    <Header></Header>
     <main className = {styles.container} > {children} </main>
     <Footer/>
     </>

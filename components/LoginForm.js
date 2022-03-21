@@ -44,10 +44,12 @@ const LoginForm = ({providers, csrfToken}) => {
   return (
       <div className={formStyle.wrapper}>
           {Object.values(providers).filter(provider =>provider.name != "Credentials").map((provider) =>(
+              <div className={formStyle.innerForm}>
               <div className={formStyle.formGroup} key ={provider.name}>
                   <button onClick={() => signIn(provider.id, {callbackUrl: "/"})}>
                       Sign in with {provider.name}
                   </button>
+              </div>
               </div>
           ))}
 
