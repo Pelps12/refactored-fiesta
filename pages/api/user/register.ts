@@ -1,12 +1,7 @@
 import {NextApiRequest, NextApiResponse}from 'next'
 import DOMPurify from 'isomorphic-dompurify'
 import {getSession} from "next-auth/react"
-import {  Prisma} from "@prisma/client"
-import {prisma} from "../../prisma"
 import bcrypt from 'bcrypt'
-import {redis} from "../../redis"
-import jwt from 'jsonwebtoken'
-import {connectToDatabase} from "../../../util/mongodb"
 import clientPromise from '../../../lib/mongodb'
 
 //SALT FOR PASSWORD HASH

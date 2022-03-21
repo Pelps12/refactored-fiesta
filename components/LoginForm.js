@@ -1,7 +1,8 @@
 import formStyle from "../styles/Form.module.css";
 import { useState } from "react";
-import { signIn, useSession} from "next-auth/react"
+import { signIn, useSession, getSession} from "next-auth/react"
 import { useRouter } from "next/router";
+import { MixPanelTracking } from "../util/Mixpanel";
 
 const LoginForm = ({providers, csrfToken}) => {
     const {data: session} = useSession();
@@ -26,7 +27,12 @@ const LoginForm = ({providers, csrfToken}) => {
 
 				console.log("Result:" + result.status);
 
-				if (!result.error) {
+				if (!result.error){
+                    const session = await getSession();
+                    console.log(session);
+                    MixPanelTracking.getInstance().loggedIn(session)
+                    MixPanelTracking.getInstance().track("logged in")
+                    console.log("Hello");
 					router.replace("/home");
 				}
 			} catch (error) {
@@ -46,7 +52,7 @@ const LoginForm = ({providers, csrfToken}) => {
           {Object.values(providers).filter(provider =>provider.name != "Credentials").map((provider) =>(
               <div className={formStyle.innerForm}>
               <div className={formStyle.formGroup} key ={provider.name}>
-                  <button onClick={() => signIn(provider.id, {callbackUrl: "/"})}>
+                  <button onClick={() => signIn(provider.id, {callbackUrl: "http://localhost:3000/home"})}>
                       Sign in with {provider.name}
                   </button>
               </div>
