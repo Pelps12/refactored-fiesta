@@ -15,7 +15,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
     const url:URL = new URL(req.url, `http://${req.headers.host}`)
     const token:any = await getToken({req})
     const product:string = url.searchParams.get('product')
-    var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
+    
     const sellerQ:string = url.searchParams.get('seller')
     const area:string = url.searchParams.get("area")
     const near:string = url.searchParams.get("near")
@@ -23,27 +23,31 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
     const client = await clientPromise;
     const db = client.db(process.env.MONGODB_DB)
     var ua = parser(req.headers["user-agent"])
-        console.log(ua)
+        
         var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        console.log(ip)
+        
     switch(req.method){
         case "GET":
             try{
-                console.log(new Date())
+                
                 const session:any = await getSession({req})
+
+                //Change later
+                
                 
                 let listings:any
-                console.log(sellerQ, product)
-                console.log("Near: "+near)
+                
                 const per_page:number = parseInt(url.searchParams.get("per_page"))
                 const page_no:number = parseInt(url.searchParams.get("page"))
+                
                 
                 const offset:number = per_page *(page_no - 1)
                 console.log(offset)
                 const query = {...(sellerQ && {seller: new ObjectId(sellerQ)}),
-                            ...(product && {productId: product === "mine" ?  new ObjectId(session.id) :  new ObjectId(product)}),
+                            ...(product && product === "mine" && {"product.id": session.id}),
+                            ...(product && product !== "mine" && {"product.name" : product}),
                             ...(area && {area: area}),
-                            ...(near!== null && {location:{
+                            ...(near && {location:{
                                 $nearSphere: {
                                     $geometry:{
                                         type: "Point",
@@ -52,43 +56,66 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                                     $maxDistance: parseInt(distance)
                                 }
                             }})}
-                console.log(query)
+               
                 listings = await db
                 .collection("listings")
                 .find(query)
                 .limit(isNaN(per_page) ? 2: per_page)
                 .skip(isNaN(offset) ? 1 : offset)
                 .toArray()
-
-                const sellers = new Map()
-                
-                for await (let listing of listings) {
-                    const sellerId:string = listing.seller.toString().split('\"')[0]
-                        if(sellers.has(sellerId)){
-                            console.log("Here")
-                            listing.seller = sellers.get(sellerId)
-                        }
-                        else{
-                            listing.seller = await db.collection("users")
-                            .findOne({_id: new ObjectId(listing.seller)}, 
-                                        { projection: { password: 0 ,
-                                                        accountBank: 0,
-                                                        accountNumber: 0,
-                                                        roles: 0,
-                                                        sellerId: 0,
-                                                        subaccount_id: 0,}})
                             
-                            sellers.set(sellerId, listing.seller)
-                        }
+                
+                
+                if(!sellerQ){
+                    const sellers = new Map()
+                    for await (let listing of listings) {
+                        const sellerId:string = listing.seller.toString().split('\"')[0]
+                            if(sellers.has(sellerId)){
+                                
+                                listing.seller = sellers.get(sellerId)
+                            }
+                            else{
+                                listing.seller = await db.collection("users")
+                                .findOne({_id: new ObjectId(listing.seller)}, 
+                                            { projection: { password: 0 ,
+                                                            area:0,
+                                                            location:0,
+                                                            accountBank: 0,
+                                                            accountNumber: 0,
+                                                            roles: 0,
+                                                            sellerId: 0,
+                                                            subaccount_id: 0,}})
+                                
+                                sellers.set(sellerId, listing.seller)
+                            }
+                    }
                 }
+                else{
+                    const seller = await db.collection("users")
+                                    .findOne({_id: new ObjectId(sellerQ)}, 
+                                    { projection: { password: 0 ,
+                                                    area:0,
+                                                    location:0,
+                                                    accountBank: 0,
+                                                    accountNumber: 0,
+                                                    roles: 0,
+                                                    sellerId: 0,
+                                                    subaccount_id: 0,}})
+                    
+                    for await (let listing of listings) {
+                        listing.seller = seller
+                    }
+                    
+                }
+                
+                
                
 
                 
-                //console.log("Hello");
-                console.log("Listings: "+listings)
+                
                 
                 if(listings){
-                    res.status(200).json({status: "success", "page": isNaN(page_no)? 1: page_no, "listings":listings})
+                    res.status(200).json(listings)
                 }
                 else{
                     res.status(404).json({status: "success", "listings":listings, ...(page_no && {"page": page_no})})
@@ -113,19 +140,28 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                     startingPrice = DOMPurify.sanitize(startingPrice)
                     productId = DOMPurify.sanitize(productId)
                     //console.log(40)
+                    const [product, seller] = await Promise.all([
+                        db.collection("products").findOne({_id: new ObjectId(productId)}),
+                        db.collection("users").findOne({_id: new ObjectId(session.id)})
+                    ])
                     
+                    console.log(product)
                     
                     
                     const listing = await db
                     .collection("listings") //Remember to sanitize the body
                     .insertOne({expiresAt: convertToDateTime(expiresAt), 
                                 startingPrice: parseFloat(startingPrice),
-                                product: productId,
+                                product: product,
                                 seller: new ObjectId(session.id),
+                                area: seller.area,
+                                location: seller.location,
                                 available:true,
                                 createdAt: new Date() })
                     
                     res.status(201).json(listing)
+
+                    var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
 
                     mixpanel.track("listing posted", {
                         distinct_id: session?.id,

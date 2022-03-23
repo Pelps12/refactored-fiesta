@@ -10,18 +10,8 @@ export async function middleware(req:any){
         console.log("LOGIN OR REGISTER")
         
         //console.log(session)
-        if(session) return NextResponse.redirect("/home")
+        if(session) return NextResponse.redirect("/")
     }
-    if(req.nextUrl.pathname.includes("/home")){
-            console.log(req.headers)
-        if(!session){
-            return NextResponse.redirect("/")
-        }
-    }
-    if(req.nextUrl.pathname === "/"){
-        if(session){
-            return NextResponse.redirect("/home")
-        }
-    }
+
     
 }
