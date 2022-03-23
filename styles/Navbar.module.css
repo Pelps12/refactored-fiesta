@@ -1,27 +1,4 @@
-.header{
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 20px 10%;
-    background-color: rgba(255, 130, 67, 0.73);
-    /* background:transparent; */
- 
-}
- 
-.logo{
-    font-family: 'Epilogue';
-    font-weight: bold;
-    font-size: 25px;
-    text-decoration: none;
-    color: #ff8243;
-    cursor: pointer;
-    margin-right: auto;
-    flex: 1 0 auto;
- 
-}
 
- 
- 
 .navBtn{
     font-family: 'Epilogue';
     font-weight: 500;
