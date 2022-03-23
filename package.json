@@ -43,6 +43,7 @@
     "ws": "^8.5.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/cookies": "^0.7.7",
     "@types/ioredis": "^4.28.8",
     "@types/jsonwebtoken": "^8.5.8",

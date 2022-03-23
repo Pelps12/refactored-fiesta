@@ -1,29 +1,35 @@
 .navLink{
     list-style: none;
+  display: flex;
    
    
 }
 .navAnchor{
     font-family: 'Epilogue';
-    font-weight: bold;
+    font-weight: 500;
     font-size: 20px;
     text-decoration: none;
     color: white;
     transition: all 0.3s ease 0s;
     
 }
+
  
 .navAnchor:hover{
     background-color: white;
 }
 .navList{
-    display: inline-block;
+    /* display: inline-block;
     padding: 0 10px;
     white-space: nowrap;
+    background-color: black; */
+    padding: 0px 20px;
+    
   
 }
 .navBtn{
     display: none;
+    
 }
 
 @media (max-width: 990px) {

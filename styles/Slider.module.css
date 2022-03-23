@@ -15,10 +15,10 @@
 
 .header{
   display: flex;
-  justify-content: flex-end;
-  padding: 20px 10%;
-  width: 100%;
-  background-color: rgba(255, 130, 67, 0.73);
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 10%;
+  background-color: rgba(255, 130, 67, 1);
 
 
 }
@@ -30,8 +30,9 @@
   text-decoration: none;
   color: white;
   cursor: pointer;
-  margin-right: auto;
-  flex: 1 0 auto;
+  /* margin-right: auto; */
+  /* flex: 1 0 auto;
+  background-color: ; */
 
 }
 .navBtn{
@@ -39,16 +40,39 @@
   font-weight: 500;
   font-size: 16px;
   text-decoration: none;
-  color: rgba(255, 130, 67, 1);
-  margin-left: 20px;
+  color: white;
+  /* margin-left: 20px; */
   padding: 9px 25px;
-  background-color: white;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease 0s;
-  margin-top: 5%;
+  margin-top: 7%;
  
+  
+  /* margin-top: 5%; */
+ 
+}
+.btnIcon{
+  display: flex;
+  margin-right: -13.2%;
+}
+
+.navIcon{
+  font-family: 'Epilogue';
+  font-weight: bold;
+  font-size: 20px;
+  text-decoration: none;
+  color: white;
+  /* margin-left: 20px; */
+  padding: 9px 25px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 3%;
+  transition: all 0.3s ease 0s;
+ 
+
 }
 
 .navBtn:hover{
@@ -70,7 +94,13 @@
   .navAnchor{
       display: none;
   }
+  .navIcon{
+    display: none;
+  }
   
+  .btnIcon{
+    display: none;
+  }
   
 }
 

@@ -1,46 +1,49 @@
 import formStyle from "../styles/Form.module.css";
 import { useState } from "react";
-import { signIn, useSession, getSession} from "next-auth/react"
+import { signIn, useSession, getSession } from "next-auth/react"
 import { useRouter } from "next/router";
 import { MixPanelTracking } from "../util/Mixpanel";
 
-const LoginForm = ({providers, csrfToken}) => {
-    const {data: session} = useSession();
+const LoginForm = ({ providers, csrfToken }) => {
+    const { data: session } = useSession();
     console.log(session);
     const router = useRouter();
     const [userCredentials, setUserCredentials] = useState({
-		email: "",
-		password: "",
-	});
+        email: "",
+        password: "",
+    });
 
     const { email, password } = userCredentials;
 
-    const handleSubmit = async (e) =>{
-            e.preventDefault();
-			try {
-                console.log("Here")
-				const result = await signIn("credentials", {
-					redirect: false,
-					email: email,
-					password: password,
-				});
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            console.log("Here")
+            const result = await signIn("credentials", {
+                redirect: false,
+                email: email,
+                password: password,
+            });
 
-				console.log("Result:" + result.status);
+            console.log("Result:" + result.status);
 
-				if (!result.error){
-                    const session = await getSession();
-                    console.log(session);
-                    MixPanelTracking.getInstance().loggedIn(session)
-                    MixPanelTracking.getInstance().track("logged in")
-                    console.log("Hello");
-					router.replace("/home");
-				}
-			} catch (error) {
-                //Display error message
-				console.log(error);
-			}
-		
-        
+            if (!result.error) {
+                const session = await getSession();
+                console.log(session);
+                MixPanelTracking.getInstance().loggedIn(session)
+                MixPanelTracking.getInstance().track("logged in")
+                console.log("Hello");
+                router.replace("/home");
+            }
+            if(!result.ok){
+                console.log(`${result.status} not authorized`)
+            }
+        } catch (error) {
+            //Display error message
+            console.log(error);
+        }
+
+
     }
     const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -82,27 +85,8 @@ const LoginForm = ({providers, csrfToken}) => {
 				/><br/>
                 <button type="submit">Sign in</button>
             </form>
-
-        {/* <form onClick={handleSubmit} className={formStyle.form} >
-            <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
-            <div className={formStyle.innerForm}>
-                <h2>LOGIN</h2>
-                    
-                <div className={formStyle.formGroup}>
-                    <label htmlFor="email">Email:</label>
-                    <input type="text" name="email" id="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)}/>
-                </div>
-                <div className={formStyle.formGroup}>
-                    <label htmlFor="password">Password:</label>
-                    <input placeholder = "password" type="text" name="password" id="password" value={password} onChange={(e) =>setPassword(e.target.value)}/>
-                </div>
-                <button type="submit">LOG IN</button>
             </div>
-        </form> */}
-      </div>
-   
-  )
-}
 
-
+        )
+          }
 export default LoginForm

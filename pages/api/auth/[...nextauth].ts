@@ -5,6 +5,7 @@ import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "../../../lib/mongodb";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDatabase } from "../../../util/mongodb";
+import bcrypt from "bcrypt"
 var Mixpanel = require('mixpanel');
 import {v4 as uuidv4} from "uuid"
 
@@ -33,7 +34,7 @@ export default NextAuth({
                     return null
                 }
                 
-                const match = true
+                const match = await bcrypt.compare(credentials.password, user.password)
                 console.log(match)
                 if(!match){
                     return null
@@ -108,4 +109,7 @@ export default NextAuth({
         return session
     }
 },
+events:{
+    
+}
 });
