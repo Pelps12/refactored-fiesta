@@ -67,8 +67,8 @@ const Body = ({session}) => {
         
     }
     return (
-        <div className="sm:m-auto lg:grid lg:ml-0 lg:grid-cols-4">
-            <div className="m-4  col-span-1 sm:m-auto">
+        <div className="m-auto md:grid md:ml-0 md:grid-cols-4">
+            <div className="m-4 max-w-md col-span-1 ">
                 <form className={bodyStyles}>
                    <div className="body-form">
                    <label className="p-2" htmlFor="location">Location</label>
@@ -136,7 +136,7 @@ const Body = ({session}) => {
                 <p>
                     showing {size} page(s) of {isLoadingMore ? "..." : listings.length}{" "}
                     listing(s){" "}
-                    <div className="grid grid-cols-3 max-w-md">
+                    <div className=" hidden sm:grid sm:grid-cols-3 max-w-md md:grid-cols-1 xl:grid xl:grid-cols-3 ">
                         <button
                         className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 md:px-2 md:py-1"
                         disabled={isLoadingMore || isReachingEnd}
@@ -148,7 +148,7 @@ const Body = ({session}) => {
                             ? "no more listings"
                             : "load more"}
                         </button>
-                        <button className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 " disabled={isRefreshing} onClick={() => mutate()}>
+                        <button className="disabled:bg-slate-500 rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 md:px-2 md:py-1" disabled={isRefreshing} onClick={() => mutate()}>
                         {isRefreshing ? "refreshing..." : "refresh"}
                         </button>
                         <button className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200"disabled={!size} onClick={() => setSize(0)}>
@@ -159,16 +159,39 @@ const Body = ({session}) => {
                 </p>
                 {isEmpty ? <p>No listings available</p> : null}
             </div>
-            <div className="lg:grid lg:grid-cols-3 lg:col-span-3 ">
-                {listings.map((listing) =>{
-                    return(
-                        <div key={listing._id}>
-                            <Listing listing={listing}/>
-                        </div>
-                    )
-                    
-                })}
+            <div className=" md:col-span-3 ">
+                <div className="md:grid md:grid-cols-3">
+                    {listings.map((listing) =>{
+                        return(
+                            <div key={listing._id}>
+                                <Listing listing={listing}/>
+                            </div>           
+                        )                   
+                    })}
+                </div>
+
+                <div className="grid mx-auto grid-cols-3 max-w-md md:hidden ">
+                        <button
+                        className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 md:px-2 md:py-1"
+                        disabled={isLoadingMore || isReachingEnd}
+                        onClick={() => setSize(size + 1)}
+                        >
+                        {isLoadingMore
+                            ? "loading..."
+                            : isReachingEnd
+                            ? "no more listings"
+                            : "load more"}
+                        </button>
+                        <button className="disabled:bg-slate-500 rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 md:px-2 md:py-1" disabled={isRefreshing} onClick={() => mutate()}>
+                        {isRefreshing ? "refreshing..." : "refresh"}
+                        </button>
+                        <button className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200"disabled={!size} onClick={() => setSize(0)}>
+                        clear
+                        </button>
+                    </div>
+                
             </div>
+            
         </div>
     )
 }
