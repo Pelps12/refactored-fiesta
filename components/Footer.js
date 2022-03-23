@@ -1,20 +1,25 @@
 import footerStyle from "../styles/Footer.module.css";
-import {TiSocialTumbler} from 'react-icons/ti'
+import {TiSocialFacebook, TiSocialTwitter, TiSocialInstagram} from 'react-icons/ti'
+import { useRouter } from "next/router";
+import Link from "next/link";
+
 
 const Footer = () => {
+
   return (
-    <div className= {footerStyle.container}>
-        <div className={footerStyle.socialIcons}>
-          <TiSocialTumbler size='30px'/>
-          <TiSocialTumbler size='30px'/>
-          <TiSocialTumbler size='30px'/>
-          <TiSocialTumbler size='30px'/>
-          <TiSocialTumbler size='30px'/>
-        </div>
-        <div className={footerStyle.text}>
-          <p>LASLAS All Rights Reserved</p>
-        </div>
+    <footer><div className={footerStyle.container}>
+      <div className="grid grid-cols-3">
+        <Link href="/">
+          <TiSocialFacebook size='30px' />
+        </Link>
+      <TiSocialTwitter size='30px' />
+      <TiSocialInstagram size='30px' />
+
     </div>
+    <div className={footerStyle.text}>
+        <p>LASLAS All Rights Reserved</p>
+      </div>
+    </div></footer>
   )
 }
 

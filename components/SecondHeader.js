@@ -6,7 +6,7 @@ import MobileNavigation from "./MobileNavigation";
 const SecondHeader = () => {
   return (
     <div className={sliderStyles.header}>
-    <h1 className={sliderStyles.logo}>Las-Las</h1>
+    <h1 className={sliderStyles.logo}>LasPrice</h1>
     <Navigation/>
     <MobileNavigation/>
     <a className={sliderStyles.navAnchor} href=""><button className={sliderStyles.navBtn}>Become a Seller</button></a>

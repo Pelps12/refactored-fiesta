@@ -9,15 +9,15 @@ import Listing from "./Listing"
 const fetcher = (url) => fetch(url).then((res) => res.json());
 const PAGE_SIZE = 6;
 
-const Body = ({session}) => {
+const Body = () => {
     const router = useRouter()
     const [query, setQuery] = useState("")
     const [location, setLocation] = useState("")
     const [product, setProduct] = useState("")
-    
-    
+    const {data:session, status } = useSession()
+     
     useEffect(()=>{
-        console.log("Fuck you");
+        console.log(session);
     }, [session])
 
 
@@ -131,11 +131,9 @@ const Body = ({session}) => {
                         <option value="maggi">Maggi</option>
                     </select>
                     </div>
-                    <button className="rounded-md justify-center px-3 py-2 block m-4 bg-orange-500" onClick={updateQuery} type="submit">SEARCH</button>
+                    <button className="mx-auto md:m-4 rounded-md justify-center px-3 py-2 block bg-orange-500" onClick={updateQuery} type="submit">SEARCH</button>
                 </form>
                 <p>
-                    showing {size} page(s) of {isLoadingMore ? "..." : listings.length}{" "}
-                    listing(s){" "}
                     <div className=" hidden sm:grid sm:grid-cols-3 max-w-md md:grid-cols-1 xl:grid xl:grid-cols-3 ">
                         <button
                         className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 md:px-2 md:py-1"
