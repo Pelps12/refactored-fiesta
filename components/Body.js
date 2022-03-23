@@ -67,8 +67,8 @@ const Body = ({session}) => {
         
     }
     return (
-        <div className="sm:m-auto sm:grid md:ml-0 md:grid-cols-4">
-            <div className="m-4 max-w-md col-span-1">
+        <div className="sm:m-auto lg:grid lg:ml-0 lg:grid-cols-4">
+            <div className="m-4  col-span-1 sm:m-auto">
                 <form className={bodyStyles}>
                    <div className="body-form">
                    <label className="p-2" htmlFor="location">Location</label>
@@ -138,7 +138,7 @@ const Body = ({session}) => {
                     listing(s){" "}
                     <div className="grid grid-cols-3 max-w-md">
                         <button
-                        className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200"
+                        className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 md:px-2 md:py-1"
                         disabled={isLoadingMore || isReachingEnd}
                         onClick={() => setSize(size + 1)}
                         >
@@ -148,7 +148,7 @@ const Body = ({session}) => {
                             ? "no more listings"
                             : "load more"}
                         </button>
-                        <button className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200" disabled={isRefreshing} onClick={() => mutate()}>
+                        <button className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 " disabled={isRefreshing} onClick={() => mutate()}>
                         {isRefreshing ? "refreshing..." : "refresh"}
                         </button>
                         <button className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200"disabled={!size} onClick={() => setSize(0)}>
@@ -159,7 +159,7 @@ const Body = ({session}) => {
                 </p>
                 {isEmpty ? <p>No listings available</p> : null}
             </div>
-            <div className="grid grid-cols-3 col-span-3">
+            <div className="lg:grid lg:grid-cols-3 lg:col-span-3 ">
                 {listings.map((listing) =>{
                     return(
                         <div key={listing._id}>
