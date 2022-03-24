@@ -16,7 +16,7 @@ const IconLinks = () => {
   }, [session])
   function handleSubmit(e) {
     e.preventDefault();
-    signOut();
+    signOut({callbackUrl: "http://localhost:3000"});
   }
   return (
     <div className={iconStyles.action}>
