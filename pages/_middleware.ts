@@ -1,3 +1,4 @@
+import { TokenExpiredError } from "jsonwebtoken"
 import {getToken} from "next-auth/jwt"
 import {NextResponse, NextRequest} from "next/server"
 
@@ -11,6 +12,10 @@ export async function middleware(req:any){
         
         //console.log(session)
         if(session) return NextResponse.redirect("/")
+    }
+
+    if(req.nextUrl.pathname === "/dashboard" && session.roles === "buyer"){
+        return NextResponse.redirect("/")
     }
 
     

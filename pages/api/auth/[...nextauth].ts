@@ -105,7 +105,7 @@ export default NextAuth({
     async session({session, token, user}){
         session.accessToken = token.accessToken
         session.id = token.id
-        session.roles = token.roles
+        
         //console.log(session)
         return session
     }

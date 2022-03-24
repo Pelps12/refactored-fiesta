@@ -24,7 +24,7 @@ const RegisterForm = ({ providers }) => {
             return;
         }
         try {
-            console.log(`Email ${email}, Password ${password}`)
+
             const res = await fetch('api/user/register', {
                 body: JSON.stringify({
                     name: fullName,

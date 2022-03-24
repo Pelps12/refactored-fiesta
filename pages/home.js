@@ -4,6 +4,11 @@ import { MixPanelTracking } from "../util/Mixpanel";
 
 const Home = ({origin}) => {
     console.log(origin);
+    const { data: session, status } = useSession()
+    if (status === "authenticated") {
+        
+        console.log(session.user)
+      }
     
     
     
