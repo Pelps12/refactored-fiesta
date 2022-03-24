@@ -68,7 +68,7 @@ const Body = () => {
     }
     return (
         <div className="m-auto md:grid md:ml-0 md:grid-cols-4">
-            <div className="m-4 max-w-md col-span-1 ">
+            <div className="m-4  col-span-1 ">
                 <form className={bodyStyles}>
                    <div className="body-form">
                    <label className="p-2" htmlFor="location">Location</label>
@@ -157,7 +157,7 @@ const Body = () => {
                 </p>
                 {isEmpty ? <p>No listings available</p> : null}
             </div>
-            <div className=" md:col-span-3 ">
+            <div className=" md:col-span-3 content-justify">
                 <div className="md:grid md:grid-cols-3">
                     {listings.map((listing) =>{
                         return(

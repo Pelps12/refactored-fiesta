@@ -6,7 +6,7 @@ import { createLanguageServiceSourceFile } from "typescript";
 const Listing = ({listing}) => {
     console.log(listing.seller.profilePic);
     return ( 
-        <div className="drop-shadow-xl m-4 p-4 bg-teal-200">
+        <div className="drop-shadow-xl m-4 p-4 bg-cyan-200 rounded-md">
             <div className="grid grid-cols-3">
                 <div>
                     <Image 
