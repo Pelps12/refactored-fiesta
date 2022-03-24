@@ -5,9 +5,10 @@ import { useRouter } from "next/router";
 import { MixPanelTracking } from "../util/Mixpanel";
 
 const LoginForm = ({ providers, csrfToken }) => {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     console.log(session);
     const router = useRouter();
+    const [error, setError] = useState("");
     const [userCredentials, setUserCredentials] = useState({
         email: "",
         password: "",
@@ -35,9 +36,12 @@ const LoginForm = ({ providers, csrfToken }) => {
                 console.log("Hello");
                 router.replace("/home");
             }
-            if(!result.ok){
-                console.log(`${result.status} not authorized`)
+            const checking = result.ok;
+            console.log("HelloJohn" + checking);
+            if (!result.ok) {
+                setError("Your password is incorrect");
             }
+
         } catch (error) {
             //Display error message
             console.log(error);
@@ -46,47 +50,66 @@ const LoginForm = ({ providers, csrfToken }) => {
 
     }
     const handleChange = (e) => {
-		const { name, value } = e.target;
+        const { name, value } = e.target;
 
-		setUserCredentials({ ...userCredentials, [name]: value });
-	};
-  return (
-      <div className={formStyle.wrapper}>
-          {Object.values(providers).filter(provider =>provider.name != "Credentials").map((provider) =>(
-              <div className={formStyle.innerForm} key ={provider.name}>
-                <div className={formStyle.formGroup} key ={provider.name}>
-                    <button onClick={() => signIn(provider.id, {callbackUrl: "http://localhost:3000/home"})}>
-                        Sign in with {provider.name}
-                    </button>
+        setUserCredentials({ ...userCredentials, [name]: value });
+    };
+    return (
+        <div className={formStyle.wrapper}>
+
+            <div className={formStyle.imageBox}>
+
+            </div>
+            <div className={formStyle.content}>
+                <div className={formStyle.formBox}>
+                    {/* <div>
+      The user is <b>{result?.ok ? 'currently' : 'not'}</b> logged in.    </div> */}
+                    <div><p>{error}</p></div>
+                    <form onSubmit={handleSubmit} className={formStyle.formGroup}>
+                        <h2>Login</h2>
+                        <div className={formStyle.inputBox}>
+                            <input
+                                className="input"
+                                type="email"
+                                placeholder="Email Address"
+                                required
+                                value={email}
+                                onChange={handleChange}
+                                name="email"
+                                autoComplete="email"
+                            />
+                        </div>
+                        <div className={formStyle.inputBox}>
+                            <input
+                                className="input"
+                                type="password"
+                                placeholder="Password"
+                                required
+                                value={password}
+                                onChange={handleChange}
+                                name="password"
+                                autoComplete="password"
+                            />
+                        </div>
+                        <div className={formStyle.inputBox}>
+                            <input type="submit" value="Sign in" />
+                        </div>
+
+                    </form>
+                    {Object.values(providers).filter(provider => provider.name != "Credentials").map((provider) => (
+                        <div className={formStyle.innerForm} key={provider.name}>
+                            <div className={formStyle.formGroup} key={provider.name}>
+                                <button onClick={() => signIn(provider.id, { callbackUrl: "http://localhost:3000/home" })}>
+                                    Sign in with {provider.name}
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-              </div>
-          ))}
-
-            <form onSubmit={handleSubmit} className={formStyle.formGroup}>
-            <input
-					className="input"
-					type="email"
-					placeholder="Email Address"
-					required
-					value={email}
-					onChange={handleChange}
-					name="email"
-					autoComplete="email"
-				/><br/>
-				<input
-					className="input"
-					type="password"
-					placeholder="Password"
-					required
-					value={password}
-					onChange={handleChange}
-					name="password"
-					autoComplete="password"
-				/><br/>
-                <button type="submit">Sign in</button>
-            </form>
             </div>
 
-        )
-          }
+        </div>
+
+    )
+}
 export default LoginForm

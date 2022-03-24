@@ -1,0 +1,110 @@
+.wrapper{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+}
+
+.wrapper .imageBox{
+   
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.wrapper .content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+
+}
+
+.wrapper .content .formBox{
+    width: 50%;
+    padding: 40px;
+    
+    margin: 50px;
+}
+
+.wrapper .content .formBox h2{
+   color: orange;
+   font-weight: 600;
+   font-size: 1.5em;
+   text-transform: uppercase;
+   margin-bottom: 20px;
+   border-bottom: 4px solid orange;
+   display: inline-block;
+   letter-spacing: 1px;
+}
+
+.wrapper .content .formBox .inputBox{
+    margin-bottom: 20px;
+}
+
+.wrapper .content .formBox .inputBox{
+    margin-bottom: 20px;
+}
+
+.wrapper .content .formBox .inputBox input{
+    width: 100%;
+    padding: 10px 20px;
+    outline: none;
+    font-weight: 400;
+    border: 1px solid orange;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: orange;
+    background: transparent;
+    border-radius: 30px;
+}
+
+.wrapper .content .formBox .inputBox input[type="submit"]{
+    background: orange;
+    color: white;
+    outline: none;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+.wrapper .content .formBox .inputBox input[type="submit"]:hover{
+    background: teal;
+}
+.wrapper .content .formBox .inputBox p{
+   color: teal;
+}
+
+.wrapper .content .formBox .inputBox p a{
+    color: teal;
+ }
+
+.formGroup button{
+    white-space: nowrap;
+}
+ @media (max-width: 768px){
+     .wrapper .imageBox{
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+     }
+     .wrapper .content{
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         width: 100%;
+         height: 100%;
+         z-index: 1;
+     }
+     .wrapper .content .formBox{
+         width: 100%;
+         padding: 40px;
+         background: rgb(255 255 255 / 0.9);
+         margin: 50px;
+     }
+ }

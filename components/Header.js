@@ -18,11 +18,11 @@ const Header = () => {
 
   return (
     <div className={sliderStyles.header}>
-      <h1 className={sliderStyles.logo}>Las Price</h1>
+      <h1 className={sliderStyles.logo}><a href="/">Las Price</a></h1>
       <Navigation/>
       <MobileNavigation/>
       <div className={sliderStyles.btnIcon}>
-      <a className={sliderStyles.navAnchor} href=""><button className={sliderStyles.navBtn}>Become a Seller</button></a>
+      <a className={sliderStyles.navAnchor} href="/seller"><button className={sliderStyles.navBtn}>Become a Seller</button></a>
       {/* <a className={sliderStyles.navAnchor} href=""><button className={sliderStyles.navBtn}><MdOutlineAccountCircle size={33}/></button></a> */}
       <nav className={sliderStyles.navIcon}>
         {open ? closeIcon : hamburgerIcon}
