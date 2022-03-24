@@ -7,9 +7,9 @@ export async function middleware(req:any){
     //console.log(req)
     const session = await getToken({req})
     console.log(session)
-    if(req.nextUrl.pathname.includes("/login") || 
-    req.nextUrl.pathname.includes("/register") &&
-     !req.nextUrl.pathname.includes("/api")){
+    if(req.nextUrl.pathname=== "/login" || 
+    req.nextUrl.pathname==="/register") 
+     {
         console.log("LOGIN OR REGISTER")
         
         //console.log(session)
