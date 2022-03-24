@@ -144,14 +144,15 @@ const RegisterForm = ({ providers }) => {
                         </div>
 
                     </form>
+                    
                     {Object.values(providers).filter(provider => provider.name != "Credentials").map((provider) => (
-                        <div className={formStyle.innerForm}>
-                            <div className={formStyle.formGroup} key={provider.name}>
-                                <button onClick={() => signIn(provider.id, { callbackUrl: "/home" })}>
+                        
+                            <div className="container mx-auto" key={provider.name}>
+                                <button className={`rounded-md content-center px-2 py-3 ${provider.id === "facebook"? "bg-[#1778F2] text-white": "bg-slate-200 text-black"}`} onClick={() => signIn(provider.id, { callbackUrl: "/home" })}>
                                     Register with {provider.name}
                                 </button>
                             </div>
-                        </div>
+                        
 
                     ))}
                 </div>
