@@ -74,6 +74,9 @@ const SellerForm = () => {
                         </div>
                         
                 </form>
+                <div className={formStyle.inputBox}>
+                            <input type="submit" value="Create" />
+                        </div>
                 </div>
             </div>
         </div>

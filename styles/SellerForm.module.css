@@ -40,15 +40,14 @@
    border-bottom: 4px solid orange;
    display: inline-block;
    letter-spacing: 1px;
+   white-space: nowrap;
 }
 
 .wrapper .content .formBox .inputBox{
-    margin-bottom: 20px;
+    margin-bottom: 2%;
 }
 
-.wrapper .content .formBox .inputBox{
-    margin-bottom: 20px;
-}
+
 
 .wrapper .content .formBox .inputBox input{
     width: 100%;

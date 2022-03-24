@@ -45,7 +45,7 @@
 .action .menu ul li{
     list-style: none;
     padding: 10px 0;
-    border-top: 1px solid rgba(0,0,0,0.5);
+    border-top: 0px solid rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
 }
