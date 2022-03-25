@@ -158,7 +158,7 @@ const Body = () => {
                 {isEmpty ? <p>No listings available</p> : null}
             </div>
             <div className=" md:col-span-3 content-justify">
-                <div className="md:grid md:grid-cols-3">
+                <div className="md:grid md:grid-cols-4">
                     {listings.map((listing) =>{
                         return(
                             <div key={listing._id}>

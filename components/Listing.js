@@ -6,34 +6,31 @@ import { createLanguageServiceSourceFile } from "typescript";
 const Listing = ({listing}) => {
     console.log(listing.seller.profilePic);
     return ( 
-        <div className="drop-shadow-xl m-4 p-4 bg-cyan-200 rounded-md">
-            <div className="grid grid-cols-3">
-                <div>
+        <div className="drop-shadow-xl m-4 px-2 py-4 bg-cyan-200 rounded-md">
+            <div >
+                <div className="flex justify-center px-2 py-4">
                     <Image 
-                    className="profile-pic"
+                    className="rounded-full"
                     src={listing.seller.image}
                     alt="Profile Pic"
                     width={100}
                     height={100}/>
-                    <style jsx global>{`
-                        .profile-pic {
-                            border-radius: 100%;
-                        }
-                    `}</style>
                 </div>
-                <div className="col-span-2 self-center">
-                    <h2 className="text-3xl">{listing.seller.storename}</h2>
-                    <h3>₦{listing.startingPrice}</h3>
+                <div className="text-center">
+                    <h2 className="text-3xl px-2 py-4">{listing.seller.storename}</h2>
+                    <h3 className="text-2xl px-1 py-3">₦{listing.startingPrice}</h3>
                 </div>
                 
                 
             </div>
             
             
-            
-                <PaymentButton listingId={listing._id}
-                            amount={listing.startingPrice} 
-                            bargain={"false"}/>
+                <div className="text-center">
+                    <PaymentButton listingId={listing._id}
+                                amount={listing.startingPrice} 
+                                bargain={"false"}/>
+                </div>
+                
         </div>
         
 
