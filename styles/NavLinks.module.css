@@ -31,6 +31,13 @@
     display: none;
     
 }
+@media (min-width: 990px) {
+    .hideMenu{
+    display: none;
+}
+
+    
+}
 
 @media (max-width: 990px) {
     .navAnchor{
