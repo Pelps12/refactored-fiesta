@@ -5,8 +5,10 @@ import { getToken } from "next-auth/jwt";
 export default async function ably(req: NextApiRequest, res: NextApiResponse){
     
     if(req.method === "GET"){
+        console.log(req);
         const token = await getToken({req})
         if(token){
+            
             const id: any = token.id
             const client = new Ably.Realtime(process.env.ABLY_API_KEY)
             const tokenRequestData = await client.auth.createTokenRequest({clientId: id})

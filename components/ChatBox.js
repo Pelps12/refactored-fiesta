@@ -4,7 +4,7 @@ import {v4 as uuidv4} from "uuid"
 import {configureAbly, useChannel} from "@ably-labs/react-hooks"
 
 
-configureAbly({key: "NL8toQ.CxidUQ:J9cjXtjPR1u6xGJhgfpVgFF_mP6okvVnppNofiv_WgQ", clientId: uuidv4(), authUrl: "/api/createTokenRequest"})
+configureAbly({key: "NL8toQ.CxidUQ:J9cjXtjPR1u6xGJhgfpVgFF_mP6okvVnppNofiv_WgQ", clientId: uuidv4()})
 const ChatBox = ({rId}) => {
 
     
