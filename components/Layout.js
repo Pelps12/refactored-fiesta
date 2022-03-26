@@ -13,12 +13,14 @@ const Layout = ( { children } ) => {
   const router = useRouter();
   const showHeader = router.pathname === "/" ? false : true;
   return (
-    <body className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen justify-between">
+    <header className="h-20">
+       <Header/>
+    </header>
     
-    <Header></Header>
-    <main className = {styles.container} > {children} </main>
+    <main className = "mb-auto h-10 p-6" > {children} </main>
     <Footer/>
-    </body>
+    </div>
   )
 }
 
