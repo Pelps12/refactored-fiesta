@@ -12,7 +12,7 @@ const CustomFacebook = React.forwardRef(({onClick, href}, ref) => {
 const Footer = () => {
 
   return (
-    <footer className="h-25"><div className={footerStyle.container}>
+    <footer className={footerStyle.container}> 
       <div className="grid grid-cols-3">
         <Link href="/">
           <CustomFacebook/>
@@ -24,7 +24,7 @@ const Footer = () => {
     <div className={footerStyle.text}>
         <p>LASLAS All Rights Reserved</p>
       </div>
-    </div></footer>
+    </footer>
   )
 }
 
