@@ -4,7 +4,7 @@ import listingStyles from "../styles/Body.module.css"
 import { createLanguageServiceSourceFile } from "typescript";
 
 const Listing = ({listing}) => {
-    console.log(listing.seller.image);
+    console.log(listing.seller.profilePic);
     return ( 
         <div className="drop-shadow-xl m-4 px-2 py-4 bg-cyan-200 rounded-md">
             <div >

@@ -1,5 +1,7 @@
+import { TokenExpiredError } from "jsonwebtoken"
 import {getToken} from "next-auth/jwt"
-import {NextResponse} from "next/server"
+import { getSession } from "next-auth/react"
+import {NextResponse, NextRequest} from "next/server"
 
 export async function middleware(req:any){
     //console.log(req)
