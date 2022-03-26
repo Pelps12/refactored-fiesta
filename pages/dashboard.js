@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import SellerDashboard from "../components/SellerDashboard";
 import { useSession, getCsrfToken, getSession } from "next-auth/react";
 import { MixPanelTracking } from "../util/Mixpanel";
 
@@ -20,7 +21,7 @@ const Home = ({origin}) => {
         }
                
       }, [])
-    return ( <h1>DASHBOARD</h1> );
+    return ( <SellerDashboard/> );
 }
 
 export async function getServerSideProps(context){

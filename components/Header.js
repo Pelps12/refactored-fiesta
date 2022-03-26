@@ -15,7 +15,7 @@ const Header = () => {
   const { data: session, status } = useSession();
   const [auth, setAuth] = useState(false);
   useEffect(() => {
-    if (status === 'authenticated' && session.role === 'seller') {
+    if (status === 'authenticated' && session.roles === 'seller') {
       setAuth(true);
     }
   }, [session]);
@@ -30,7 +30,7 @@ const Header = () => {
       <Navigation/>
       <MobileNavigation/>
       <div className={sliderStyles.btnIcon}>
-      {auth ? <a className={sliderStyles.navAnchor} href="/seller"><button className={sliderStyles.navBtn}>Become a Seller</button></a> : <a className={sliderStyles.navAnchor} href="/seller"><button className={sliderStyles.navBtn}>Become a Seller</button></a>}
+      {auth ? <a className={sliderStyles.navAnchor} href="/register/seller"><button className={sliderStyles.navBtn}>Dashboard</button></a> : <a className={sliderStyles.navAnchor} href="/seller"><button className={sliderStyles.navBtn}>Become a Seller</button></a>}
       {/* <a className={sliderStyles.navAnchor} href=""><button className={sliderStyles.navBtn}><MdOutlineAccountCircle size={33}/></button></a> */}
       <nav className={sliderStyles.navIcon}>
         {open ? closeIcon : hamburgerIcon}

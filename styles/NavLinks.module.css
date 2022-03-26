@@ -43,14 +43,14 @@
     .navAnchor{
         font-size: 26px;
         text-align: center;
-        color: rgba(255, 130, 67, 1);
+        color: white;
     }
     .navLink{
         display: flex;
         flex-direction: column;
         position: absolute;
         top: 80px;
-        background: white;
+        background: #93C572;
         right: 0;
         width: 100%;
         border-top: 2px solid rgba(255, 130, 67, 1);

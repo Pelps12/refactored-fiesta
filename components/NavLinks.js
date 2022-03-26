@@ -8,11 +8,10 @@ const NavLinks = (props) => {
   const [sellerAuth, setSellerAuth] = useState(false);
   useEffect(() => {
     if (status === 'authenticated') {
-      alert(session?.roles)
-      console.log("Ini "+session?.roles)
+      
       setAuth(true);
-      if(session?.roles === 'seller'){
-        alert("hello")
+      if(session.roles === 'seller'){
+        
         setSellerAuth(true)
       }
     }
@@ -28,7 +27,7 @@ const NavLinks = (props) => {
     <li className={navStyle.navList} onClick={()=> props.isMobile && props.closeMobileMenu()}><a className={navStyle.navAnchor} href="">Contact</a></li>
     {auth ? null :     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><a className={navStyle.navAnchor} href="">Sign Up</a></li>}
     {auth ?     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><a className={navStyle.navAnchor} href="">Account</a></li> :     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><a className={navStyle.navAnchor} href="/login">Log In</a></li>}
-    {sellerAuth ? <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><a className={navStyle.navAnchor} href="">Seller</a></li> : <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><a className={navStyle.navAnchor} href="/register/seller">Become a Seller</a></li>}
+    {sellerAuth ? <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><a className={navStyle.navAnchor} href="/dashboard">Dashboard</a></li> : <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><a className={navStyle.navAnchor} href="/register/seller">Become a Seller</a></li>}
   </ul>
   )
 }
