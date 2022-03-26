@@ -8,10 +8,18 @@ const NavLinks = (props) => {
   const [sellerAuth, setSellerAuth] = useState(false);
   useEffect(() => {
     if (status === 'authenticated') {
+<<<<<<< HEAD
       
       setAuth(true);
       if(session.roles === 'seller'){
         
+=======
+      //alert(session?.roles)
+      console.log("Ini "+session?.roles)
+      setAuth(true);
+      if(session?.roles === 'seller'){
+        //alert("hello")
+>>>>>>> a1376114a0103c8a553cc98fa4536f13b868d9d7
         setSellerAuth(true)
       }
     }

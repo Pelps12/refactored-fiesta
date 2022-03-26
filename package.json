@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ably-labs/react-hooks": "^1.1.5",
     "@next-auth/mongodb-adapter": "^1.0.1",
     "@prisma/client": "^3.9.2",
     "@uploadcare/upload-client": "^3.0.0",

@@ -27,6 +27,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
     switch(req.method){
         case "GET":
             const session:any = await getSession({req})
+            console.log(session)
                 if(session){
                     try{
                 

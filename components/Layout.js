@@ -13,12 +13,12 @@ const Layout = ( { children } ) => {
   const router = useRouter();
   const showHeader = router.pathname === "/" ? false : true;
   return (
-    <>
+    <body className="flex flex-col min-h-screen">
     
     <Header></Header>
     <main className = {styles.container} > {children} </main>
     <Footer/>
-    </>
+    </body>
   )
 }
 
