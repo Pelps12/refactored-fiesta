@@ -99,7 +99,7 @@ const LoginForm = ({ providers, csrfToken }) => {
                     {Object.values(providers).filter(provider => provider.name != "Credentials").map((provider) => (
                         <div className={formStyle.innerForm} key={provider.name}>
                             <div className={formStyle.formGroup} key={provider.name}>
-                                <button className={`rounded-md content-center px-2 py-3 my-2 ${provider.id === "facebook"? "bg-[#1778F2] text-white": "bg-slate-200 text-black"}`} onClick={() => signIn(provider.id, { callbackUrl: "http://localhost:3000/home" })}>
+                                <button className={`rounded-md content-center px-2 py-3 my-2 ${provider.id === "facebook"? "bg-[#1778F2] text-white": "bg-slate-200 text-black"}`} onClick={() => signIn(provider.id, { callbackUrl: "http://localhost:3000" })}>
                                     Sign in with {provider.name}
                                 </button>
                             </div>

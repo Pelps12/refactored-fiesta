@@ -2,7 +2,12 @@ import footerStyle from "../styles/Footer.module.css";
 import {TiSocialFacebook, TiSocialTwitter, TiSocialInstagram} from 'react-icons/ti'
 import { useRouter } from "next/router";
 import Link from "next/link";
-
+import React from "react";
+const CustomFacebook = React.forwardRef(({onClick, href}, ref) => {
+  return(
+    <TiSocialFacebook size='30px' />
+  )
+})
 
 const Footer = () => {
 
@@ -10,7 +15,7 @@ const Footer = () => {
     <footer><div className={footerStyle.container}>
       <div className="grid grid-cols-3">
         <Link href="/">
-          <TiSocialFacebook size='30px' />
+          <CustomFacebook/>
         </Link>
       <TiSocialTwitter size='30px' />
       <TiSocialInstagram size='30px' />
