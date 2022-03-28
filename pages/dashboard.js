@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import SellerDashboard from "../components/SellerDashboard";
+import SellerDashboard from "../components/SellerListing";
 import { useSession, getCsrfToken, getSession } from "next-auth/react";
 import { MixPanelTracking } from "../util/Mixpanel";
 
