@@ -34,7 +34,7 @@ const LoginForm = ({ providers, csrfToken }) => {
                 MixPanelTracking.getInstance().loggedIn(session)
                 MixPanelTracking.getInstance().track("logged in")
                 console.log("Hello");
-                router.replace("/home");
+                router.replace("/");
             }
             const checking = result.ok;
             console.log("HelloJohn" + checking);

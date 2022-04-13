@@ -23,10 +23,10 @@ const IconLinks = () => {
       <div className={iconStyles.menu}>
         {auth ? <h3>{session.user.name}</h3> : null}
         <ul>
-          <li>{auth ? <a href="/register">Messages</a> : <a href="/register">Sign Up</a>}</li>
-          {auth ? null : <li><a href="/login">Log In</a></li>}
-          {auth ? <li><a href="">Account</a></li> : null}
-          {auth ? <li><a onClick={handleSubmit}>Sign Out</a></li> : null}
+          <li>{auth ? <Link href="/register">Messages</Link> : <Link href="/register">Sign Up</Link>}</li>
+          {auth ? null : <li><Link href="/login">Log In</Link></li>}
+          {auth ? <li><Link href="">Account</Link></li> : null}
+          {auth ? <li><Link onClick={handleSubmit}>Sign Out</Link></li> : null}
         </ul>
       </div>
 

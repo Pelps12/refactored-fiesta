@@ -35,6 +35,8 @@ input{
 select{
   -webkit-appearance: menulist;
 }
+
+
 @layer components{
   .body-form{
       @apply flex m-2 ml-3 pb-5 pt-4

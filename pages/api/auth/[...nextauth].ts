@@ -24,7 +24,8 @@ export default NextAuth({
         authorize: async(credentials: any) =>{
             try{
                 console.log("Hello I'm in Credentials")
-                const {db} = await connectToDatabase();
+                const client = await clientPromise;
+                const db = client.db(process.env.MONGODB_DB)
                 const user = await db.collection("users").findOne({
                     email: credentials.email,
                 });

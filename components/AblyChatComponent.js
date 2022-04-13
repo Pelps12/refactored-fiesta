@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
-import {configureAbly, useChannel} from "@ably-labs/react-hooks"
+import {useChannel} from "../hooks/AblyReactEffect"
 
-configureAbly({key: "NL8toQ.CxidUQ:J9cjXtjPR1u6xGJhgfpVgFF_mP6okvVnppNofiv_WgQ", clientId: uuidv4()})
+//configureAbly({key: "NL8toQ.CxidUQ:J9cjXtjPR1u6xGJhgfpVgFF_mP6okvVnppNofiv_WgQ", clientId: uuidv4()})
 const AblyChatComponent = ()=>{
     let inputBox = null;
     let messageEnd = null;
@@ -11,6 +11,11 @@ const AblyChatComponent = ()=>{
     const [receivedMessages, setMessages] = useState([]);
     const messageTextIsEmpty = messageText.trim().length === 0;
     console.log(messages);
+    useEffect(() =>{
+      return () =>{
+        ably.close()
+      }
+    }, [])
     const [channel, ably] = useChannel("chat-demo", (message) => {
         // Here we're computing the state that'll be drawn into the message history
         // We do that by slicing the last 199 messages from the receivedMessages buffer

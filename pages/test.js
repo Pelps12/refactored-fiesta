@@ -1,19 +1,83 @@
-import {useState} from "react"
+import {useEffect, useState} from "react"
+import { Widget, WidgetAPI } from "@uploadcare/react-widget";
 
-String.prototype.hashCode = function() {
-    var hash = 0, i, chr;
-    if (this.length === 0) return hash;
-    for (i = 0; i < this.length; i++) {
-      chr   = this.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-  };
 const Test = () => {
-    const id = "6217da417a6a7b0b57c42086".hashCode()
-    console.log(id)
-    return(<h1>"Hello</h1>)
+  const [selectedFile, setSelectedFile] = useState();
+	const [isFilePicked, setIsFilePicked] = useState(false);
+  const [image, setImage] = useState(null)
+
+  const changeHandler = (event) => {
+    console.log(event.target.files[0]);
+		setSelectedFile(event.target.files[0]);
+		setIsFilePicked(true);
+
+    if (event.target.files && event.target.files[0]) {
+      setImage(URL.createObjectURL(event.target.files[0]));
+    }
+    
+    
+	};
+  useEffect(()=>{
+    console.log(image);
+  }, [image])
+
+  const handleSubmission = async () =>{
+    const formData = new FormData();
+    console.log(selectedFile);
+    formData.append("UPLOADCARE_PUB_KEY", process.env.NEXT_PUBLIC_UPLOADCARE_PUB_KEY)
+    formData.append("UPLOADCARE_STORE", "auto")
+    formData.append(`my_file.jpg`, selectedFile, selectedFile.name)
+    
+
+    const response = await fetch("https://upload.uploadcare.com/base/", {
+      method: "POST",
+      body: formData
+    })
+    if(response.ok){
+      console.log(response);
+      const result = await response.json()
+      console.log(result);
+    }
+    else{
+      console.log(response)
+    }
+  }
+    
+    return(
+      <div>
+			<input type="file"  onChange={changeHandler} className="filetype"/>
+			{isFilePicked ? (
+				<div>
+					<p>Filename: {selectedFile.name}</p>
+
+				</div>
+			) : (
+				<p>Select a file to show details</p>
+        
+			)}
+      <div>
+        <img className="object-scale-down max-w-sm max-h-sm rounded-lg" src={image}/>
+      </div>
+      
+			<div>
+				<button className="bg-orange-500 px-4 py-3 my-4 rounded-md" onClick={handleSubmission}>Submit</button>
+			</div>
+		</div>
+    )
+}
+
+const getLength =(formData) =>{
+  let length = 0;
+  formData.forEach((data) =>{
+    console.log(data);
+    if(typeof data === "string"){
+      length += data.length
+    }
+    else{
+      length += data.size
+    }
+  })
+  return length;
 }
  
 export default Test;

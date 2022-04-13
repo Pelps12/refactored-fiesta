@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import {NextApiRequest, NextApiResponse}from 'next'
 import { getToken } from 'next-auth/jwt';
 import clientPromise from '../../../lib/mongodb';
@@ -36,6 +37,10 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                 let{productName, imageURL, isPerishable, categori} = req.body
 
                 //Don't forget to sanitize input
+                productName = DOMPurify.sanitize(productName)
+                imageURL = DOMPurify.sanitize(imageURL)
+                isPerishable = DOMPurify.sanitize(isPerishable)
+                categori = DOMPurify.sanitize(categori)
                 const listing = await db
                     .collection("listings") //Remember to sanitize the body
                     .insertOne({

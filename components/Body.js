@@ -9,15 +9,19 @@ import Listing from "./Listing"
 const fetcher = (url) => fetch(url).then((res) => res.json());
 const PAGE_SIZE = 6;
 
-const Body = () => {
+const Body = ({locations, products}) => {
+    console.log(products)
     const router = useRouter()
     const [query, setQuery] = useState("")
     const [location, setLocation] = useState("")
     const [product, setProduct] = useState("")
     const {data:session, status } = useSession()
+    
      
     useEffect(()=>{
         console.log(session);
+        
+        
     }, [session])
 
 
@@ -31,11 +35,13 @@ const Body = () => {
         
     }, [router.query])
 
+
+
     
     
     const {data, error, mutate, size, setSize, isValidating} = useSWRInfinite(
         (index) =>
-            `http://localhost:3000/api/listing?${query}&per_page=${PAGE_SIZE}&page=${index+1}`, fetcher
+            `/api/listing?${query}&per_page=${PAGE_SIZE}&page=${index+1}`, fetcher
     )
     console.log(query);
     const listings = data ? [].concat(...data) : []
@@ -94,10 +100,14 @@ const Body = () => {
                             onChange={(e) => setLocation(e.target.value=== "Select an Option" ? "": e.target.value)} 
                             name="location" 
                             id={bodyStyles.location}>
-                        <option defaultValue="none">Select an Option</option>
-                        <option value="ikotun">Ikotun</option>
+                        <option defaultValue="none">All</option>
+                        {locations.filter((location) => location !== null).map((location) =>{
+                            console.log(location);
+                            return(<option key = {location}value={location}>{location}</option>)
+                        })}
+                        {/* <option value="ikotun">Ikotun</option>
                         <option value="Lekki">Lekki</option>
-                        <option value="Akoka">Akoka</option>
+                        <option value="Akoka">Akoka</option> */}
                     </select>
                    </div>
                     <div className="body-form">
@@ -125,16 +135,17 @@ const Body = () => {
                             onChange={(e) => setProduct(e.target.value=== "Select an Option" ? "": e.target.value)}
                             name="product" 
                             id={bodyStyles.product}>
-                        <option defaultValue="none">Select an Option</option>
-                        <option value="pepper">Pepper</option>
-                        <option value="Tomatoes">Tomatoes</option>
-                        <option value="maggi">Maggi</option>
+                        <option defaultValue="none">All</option>
+                        {products.map((product) =>{
+                            console.log(product.name);
+                            return(<option key = {product.name}value={product.name}>{product.name}</option>)
+                        })}
                     </select>
                     </div>
                     <button className="mx-auto md:m-4 rounded-md justify-center px-3 py-2 block bg-orange-500" onClick={updateQuery} type="submit">SEARCH</button>
                 </form>
                 <p>
-                    <div className=" hidden sm:grid sm:grid-cols-3 max-w-md md:grid-cols-1 xl:grid xl:grid-cols-3 ">
+                    <div className=" hidden  max-w-md md:grid-cols-1 xl:grid xl:grid-cols-3 mx-auto">
                         <button
                         className="rounded-md justify-center px-3 py-2 block m-4 bg-slate-200 md:px-2 md:py-1"
                         disabled={isLoadingMore || isReachingEnd}
@@ -158,11 +169,11 @@ const Body = () => {
                 {isEmpty ? <p>No listings available</p> : null}
             </div>
             <div className=" md:col-span-3 content-justify">
-                <div className="md:grid md:grid-cols-4">
+                <div className="md:grid md:grid-cols-2 lg:grid-cols-4">
                     {listings.map((listing) =>{
                         return(
                             <div key={listing._id}>
-                                <Listing listing={listing}/>
+                                <Listing listing={listing} />
                             </div>           
                         )                   
                     })}

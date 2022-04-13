@@ -7,6 +7,9 @@ export async function middleware(req:any){
     //console.log(req)
     const session = await getToken({req})
     console.log(session)
+    if(req.nextUrl.pathname.includes("/chat")){
+        if(!session) return NextResponse.redirect("/login")
+    }
     if(req.nextUrl.pathname=== "/login" || 
     req.nextUrl.pathname==="/register") 
      {

@@ -1,7 +1,10 @@
+import { useRouter } from "next/router";
 import {useState} from "react"
 
-const PaymentButton = ({listingId, amount, bargain}) => {
+const PaymentButton = ({listingId, amount, bargain, sameSeller}) => {
     const [disabled, setDisabled] = useState(false)
+    const router = useRouter()
+    console.log(sameSeller);
     const handlePayment = async () => {
         setDisabled(true)
         const res = await fetch('api/user/pay', {
@@ -30,7 +33,7 @@ const PaymentButton = ({listingId, amount, bargain}) => {
             }
             else{
                 setDisabled(false)
-                alert("Error")
+                router.push("/login")
                 console.log("Error")
             }
             
@@ -42,9 +45,9 @@ const PaymentButton = ({listingId, amount, bargain}) => {
         
       };
     return (
-        <div >
-            <button className="p-4 py-1.5 mx-auto bg-orange-500 rounded-md"disabled={disabled} onClick={handlePayment}>PAY</button>
-        </div>
+        
+            <button className="p-4 py-1.5 mx-auto bg-[#ffa500] rounded-md text-sm md:text-md"disabled={sameSeller || disabled} onClick={handlePayment}>BUY</button>
+        
     );
 }
  

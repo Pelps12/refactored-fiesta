@@ -21,29 +21,29 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
     const client = await clientPromise;
     const db = client.db(process.env.MONGODB_DB)
     var ua = parser(req.headers["user-agent"])
-        console.log(ua)
+        //console.log(ua)
         var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        console.log(ip)
+        //console.log(ip)
     switch(req.method){
         case "GET":
             const session:any = await getSession({req})
-            console.log(session)
+            //console.log(session)
                 if(session){
                     try{
                 
                         let messages:any
                         const per_page:number = parseInt(url.searchParams.get("per_page"))
                         const page_no:number = parseInt(url.searchParams.get("page"))
-                        const start:string = url.searchParams.get("start")
-                        console.log(start)
+                        const start:number = parseInt(url.searchParams.get("start"))
+                        console.log(new Date(start *1000))
                         if(!page_no && !per_page && !start){
                             return res.status(400).json({error: "Please include per_page, page_no, and start queries"})
                         }
                         const offset:number = per_page *(page_no - 1)
                         const query = {$and: [{$or:[{sender:new ObjectId(seller), receiver: new ObjectId(session.id)},
                                             {sender:new ObjectId(session.id), receiver: new ObjectId(seller)}]}, 
-                                            {createdAt: {$lt: new Date(start)}}]}
-                        console.log(query)
+                                            {createdAt: {$lt: new Date (start*1000)}}]}
+                        //console.log(query)
                         messages = await db
                                     .collection("messages")
                                     .find(query)
@@ -53,7 +53,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                                     .project({ _id: 0})
                                     .toArray()
                         //console.log("Hello");
-                        console.log("Listings: "+messages)              
+                        //console.log("Listings: "+messages)              
                         var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
                         mixpanel.track("logged in", {
                             distinct_id: session?.id ?? uuidv4(),
@@ -66,10 +66,10 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                         })
                         
                         if(messages){
-                            res.status(200).json({status: "success", "messages":messages, ...(page_no && {"page": page_no})})
+                            res.status(200).json(messages)
                         }
                         else{
-                            res.status(404).json({status: "success", "messages":messages, ...(page_no && {"page": page_no})})
+                            res.send(404)
                         }
         
                           
@@ -83,7 +83,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                             $browser_version: ua.browser.major,
         
                         })
-                        console.log(ua)
+                        //console.log(ua)
                         
                     
                     
