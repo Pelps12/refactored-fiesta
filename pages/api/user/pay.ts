@@ -92,16 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const data:any = await response.json()
                 res.status(200).json(data)
 
-                var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
-                mixpanel.track("logged in", {
-                    distinct_id: session?.id ?? uuidv4(),
-                    $insert_id: uuidv4(),
-                    ip: ip,
-                    $os: ua.os.name,
-                    $browser: ua.browser.name,
-                    $browser_version: ua.browser.major,
-
-                })
+                
             }catch(err){
                 res.status(500).json(err.message)
             }

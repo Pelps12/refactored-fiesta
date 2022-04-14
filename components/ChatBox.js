@@ -83,11 +83,11 @@ const isReachingEnd =
         let message = "";
         if(type === "text"){
           receiver.publish({ name: `message_sent`, data: {text: messageText} });
-          message = {data: {text: messageText, r: rId}, connectionId: ably.connection.id}
+          message = {data: {text: messageText, r: rId}, connectionId: "me"}
         }
         else{
           receiver.publish({ name: `message_sent`, data: {link: messageText} });
-          message = {data: {link: messageText, r: rId}, connectionId: ably.connection.id}
+          message = {data: {link: messageText, r: rId}, connectionId: "me"}
         }
          
         setMessages((prev) =>[...prev, message])
@@ -212,7 +212,7 @@ const isReachingEnd =
               </span>
             </div>
             
-            <div className="relative w-full lg:p-6 overflow-y-auto h-[40rem]" id="chat" onScroll={onScroll} ref={listInnerRef}>
+            <div className="relative w-full lg:p-6 overflow-y-auto h-[40rem] " id="chat" onScroll={onScroll} ref={listInnerRef}>
               {/* <div className={`mx-auto content-center w-full ${isReachingEnd? "hidden": null}`}>
                 <button className="bg-[#ff8243] px-4 py-3 mt-1 rounded-md" onClick={() => setSize(size +1)}>
                 {isLoadingMore
@@ -222,7 +222,7 @@ const isReachingEnd =
                               : "More"}
                 </button>
               </div> */}
-              <ul className="space-y-2">
+              <ul className="space-y-2 mb-0">
                 {
                     oldMessages.slice(0).reverse().map((message) =>{
                       const author = message.sender === session.id ? "me" : "other"
@@ -232,16 +232,17 @@ const isReachingEnd =
                             <div className={`inline-block w-fit max-w-sm lg:max-w-xl px-4 py-2 text-gray-700 rounded shadow ${author === "me"? "bg-[#FFA500] text-right": "bg-gray-100 text-left"}`}>
                                 {typeof message.message?.text === "string"? message.message?.text: <img className="object-cover rounded-md" src={message.message?.link} />}
                             </div>
-                        </li>)
+                        </li>) 
                     })
                 }
                 {
                     receivedMessages.filter(message => message.clientId === rId || message.data?.r === rId).map((message, index) =>{
                       console.log(message);
-                        const author = message?.connectionId === ably.connection.id ? "me" : "other";
-                        console.log(message.data?.link);
+                      console.log(ably.connection.id);
+                        const author = message?.connectionId === "me" ? "me" : "other";
+                        console.log(message.data?.link)
                         return(
-                        <li key={index} className={`flex ${author !== "me"? "justify-start" : "justify-end"}`}>
+                        <li key={index} className={`flex ${author !== "me"? "justify-start" : "justify-end"} mb-1`}>
                             <div className={`object-scale-down relative max-w-sm  lg:max-w-xl px-4 py-2 text-gray-700 rounded shadow ${author === "me"? "bg-[#FFA500]": "bg-gray-100"}`}>
                                 {message.data?.text !== undefined &&<span className="block" data-author={author}>{message.data.text}</span>}
                                 {message.data?.link !== undefined && <img className="object-cover rounded-md" src={message.data?.link} />}

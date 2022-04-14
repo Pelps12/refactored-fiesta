@@ -64,7 +64,7 @@ const RegisterForm = ({ providers }) => {
 
 
                 if (!result.error) {
-                    router.replace("/home");
+                    router.replace("/");
                 }
 
 

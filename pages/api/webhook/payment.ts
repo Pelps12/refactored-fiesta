@@ -15,10 +15,13 @@ export default async function payment(req: NextApiRequest, res: NextApiResponse)
             const hash:string = toString(req.headers['verif-hash'])
 
             const match = await bcrypt.compare(process.env.FLW_HASH, hash)
+            console.log(match);
             if(!match){
                 return res.send(401)
             }
-            const {id} = req.body
+            const {data} = req.body
+            const {id} = data
+            console.log(id)
             res.send(200)
             try{
                 const response = await flw.Transaction.verify({
@@ -30,13 +33,14 @@ export default async function payment(req: NextApiRequest, res: NextApiResponse)
                   console.log("Hello 39");
                   //console.log(mixpanel);
                   const meta = response.data.meta;
+                  console.log(meta.os)
                   const query= {...(meta.os && {$os: meta.os}),
                   ...(meta.browser && {$browser: meta.browser}),
                   ...(meta.browser_version && {$browser_version: meta.browser_version}),}
                   console.log(meta?.consumer_id);
                   
                 
-                    mixpanel.track("item purchased", {
+                    mixpanel.track("Item Purchase", {
                       distinct_id: meta?.consumer_id,
                       $insert_id: uuidv4(),
                       seller_id: meta?.seller_id,
@@ -44,12 +48,14 @@ export default async function payment(req: NextApiRequest, res: NextApiResponse)
                       volume: meta?.volume,
                       bargain: meta?.bargain === "true",
                       ip: meta?.ip,
-                      query,
+                      ...query,
                 
                     })
                   
                   
                   
+                }else{
+                  console.log("FFFFFF")
                 }
                 }catch (error) {
                   console.log(error)

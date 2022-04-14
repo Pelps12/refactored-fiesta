@@ -1,13 +1,18 @@
 import formStyle from "../styles/Form.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn, useSession, getSession } from "next-auth/react"
 import { useRouter } from "next/router";
-import { MixPanelTracking } from "../util/Mixpanel";
 
 const LoginForm = ({ providers, csrfToken }) => {
     const { data: session, status } = useSession();
     console.log(session);
     const router = useRouter();
+    useEffect(() =>{
+        if(router.query.error !== undefined){
+            alert("Email already used")
+        }
+    }, [router.query])
+
     const [error, setError] = useState("");
     const [userCredentials, setUserCredentials] = useState({
         email: "",
@@ -29,10 +34,6 @@ const LoginForm = ({ providers, csrfToken }) => {
             console.log("Result:" + result.status);
 
             if (!result.error) {
-                const session = await getSession();
-                console.log(session);
-                MixPanelTracking.getInstance().loggedIn(session)
-                MixPanelTracking.getInstance().track("logged in")
                 console.log("Hello");
                 router.replace("/");
             }

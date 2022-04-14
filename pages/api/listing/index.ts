@@ -163,7 +163,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
 
                     var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
 
-                    mixpanel.track("listing posted", {
+                    mixpanel.track("Listing Posted", {
                         distinct_id: session?.id,
                         $insert_id: uuidv4(),
                         starting_price: startingPrice,

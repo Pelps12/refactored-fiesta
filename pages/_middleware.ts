@@ -10,7 +10,7 @@ export async function middleware(req:any){
     if(req.nextUrl.pathname.includes("/chat")){
         if(!session) return NextResponse.redirect("/login")
     }
-    if(req.nextUrl.pathname=== "/login" || 
+    if(req.nextUrl.pathname.includes("/login") || 
     req.nextUrl.pathname==="/register") 
      {
         console.log("LOGIN OR REGISTER")

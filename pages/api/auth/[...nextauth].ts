@@ -8,7 +8,7 @@ import { connectToDatabase } from "../../../util/mongodb";
 import bcrypt from "bcrypt"
 var Mixpanel = require('mixpanel');
 import {v4 as uuidv4} from "uuid"
-
+const mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
 
 
 export default NextAuth({
@@ -112,6 +112,38 @@ export default NextAuth({
     }
 },
 events:{
-    
+    signIn({user, isNewUser}){
+        console.log("ONE")
+        if(isNewUser){
+            const [first_name, last_name]: string[] = user.name.split(" ")
+            console.log(user)
+            console.log("TWO")
+            mixpanel.people.set(user.id, {
+                $first_name: first_name,
+                $last_name: last_name,
+                $email: user.email
+            })
+            mixpanel.track("Sign Up", {
+                distinct_id: user.id,
+                $insert_id: uuidv4(),                
+              })
+        }
+        else{
+            console.log("Hello")
+            mixpanel.track("Login", {
+                distinct_id: user.id,
+                $insert_id: uuidv4(),               
+          
+              })
+        }
+        
+    },
+    signOut({token}){
+        mixpanel.track("Logout", {
+            distinct_id: token.id,
+            $insert_id: uuidv4(),                
+      
+          })
+    }
 }
 });

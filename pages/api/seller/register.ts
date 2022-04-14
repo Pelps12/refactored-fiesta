@@ -116,7 +116,7 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                                 "area": google_res.results[0]?.address_components[0]?.long_name}})
                         res.status(201).json({addSellerId})
                         var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
-                        mixpanel.track("seller created", {
+                        mixpanel.track("Seller Created", {
                             distinct_id: session?.id ?? uuidv4(),
                             $insert_id: uuidv4(),
                             ip: ip,
