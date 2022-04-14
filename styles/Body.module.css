@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .wrapper{
     display: flex;                   /* establish flex container */
     flex-direction: row;             /* flex items will align horizontally */
@@ -68,4 +69,79 @@
     
     
     
+=======
+.wrapper{
+    display: flex;                   /* establish flex container */
+    flex-direction: row;             /* flex items will align horizontally */
+    /* background-color: pink; */
+    min-height: 100%;
+    width: 100%;
+    min-width: 0;
+    overflow: auto;
+    padding-bottom: 100px;
+    background-color: #333;
+}
+
+.left{
+    flex: 0 0 20%;                   /* <flex-grow> <flex-shrink> <flex-basis> */
+    margin-right: 8px;               /* a bit of space between the centered items */
+    border: 1px dashed #333;
+    /* background-color: yellow; */
+    max-width: 20%;
+}
+
+.right{
+    flex: 0 0 80%;
+    display: flex;                   /* flex item is now also flex container */
+    flex-wrap: wrap;
+    justify-content:space-between;      /* items will stack vertically */
+    /* background-color: red; */
+    
+      /* align items vertically */
+}
+
+.products{
+    flex: 0 0 28.3%;
+    border: 1px dashed #333;
+    background-color: yellow;
+    margin: 10px;
+}
+
+
+.bodyLocation, .bodyProduct, .bodySubmit{
+    display: flex;
+    margin: 10%;
+    margin-top: 20%;
+}
+.bodySubmit{
+    justify-content:center;
+    align-items: center;
+}
+
+
+
+@media (max-width: 990px) {
+    .left{
+        flex: 0 0 30%;
+        max-width: 30%; 
+    }
+
+    .right{
+        flex: 0 0 70%;
+        justify-content: center;
+    }
+    
+    .products{
+        flex: 0 0 70%;
+    }
+    .bodyLocation, .bodyProduct, .bodySubmit{
+        display: block;
+        margin-top: 5%;
+        
+        
+    }
+    
+    
+    
+>>>>>>> 268e705aaa17b085317e004f7161fe552b4bc7be
 }
