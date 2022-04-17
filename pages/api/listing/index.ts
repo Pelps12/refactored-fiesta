@@ -64,7 +64,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                 .skip(isNaN(offset) ? 1 : offset)
                 .toArray()
                             
-                
+                console.log(query)
                 
                 if(!sellerQ){
                     const sellers = new Map()

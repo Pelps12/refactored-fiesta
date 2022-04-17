@@ -14,6 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session: any = await getSession({req})
     const referer = req.headers['referer']
     console.log(referer)
+    
 //POST ONLY
     if(session){
         let {amount, listingId, bargain} = req.body
@@ -23,17 +24,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         bargain =DOMPurify.sanitize(bargain)
         const client = await clientPromise;
         const db = client.db(process.env.MONGODB_DB)
-
+        
 
         //I don't feel like a sinner
         const [user, listing] = await Promise.all([
             db.collection("users").findOne({ _id: new ObjectId(session.id)}),
             db.collection("listings").findOne({_id: new ObjectId(listingId)})
         ])
+        //console.log(listing.seller)
+        
+        if(listing.seller.toString() === session.id){
+            return res.status(400).json({error: "Cannot buy your own product"})
+        }
         console.log(user);
         if(!listing){
             return res.status(404).json({error: "Listing does not exist"})
         }
+
         const seller = await db.collection("users").findOne({_id: new ObjectId(listing.seller)})
         console.log(seller);
         console.log(listing);
@@ -99,7 +106,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             
         
     }else{
-        res.status(404).json({error: "Not found"})
+        res.status(400).json({error: "Not found"})
     }
 }
     

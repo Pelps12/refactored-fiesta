@@ -1,17 +1,27 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/router";
 import useSWRInfinite from "swr/infinite"
 import {useChannel} from "../hooks/AblyReactEffect"
+import Offer from "./Offer";
+import {useRecoilState} from "recoil"
+import { paymentState } from "../atoms/modalAtom";
+import PaymentButton from "./PaymentButton";
 
 const fetcher = (url) => fetch(url).then((res) =>res.json())
 const PAGE_SIZE = 10;
 const ChatBox = ({rId}) => {
 
   
-
+  const [paymentOpen, setPaymentOpen] = useRecoilState(paymentState)
   const [selectedFile, setSelectedFile] = useState();
 	const [isFilePicked, setIsFilePicked] = useState(false);
+  const [volume, setVolume] = useState("")
+  const [product, setProduct] = useState("")
+  const [price, setPrice] = useState("")
+  const[listings, setListings] = useState(null)
+  const router = useRouter();
   const [image, setImage] = useState(null)
     const [receiver, setReceiver] = useState(null)
     const {data: session, status} = useSession()
@@ -25,16 +35,49 @@ const ChatBox = ({rId}) => {
       return(() => ably.close())
     }, [])
     useEffect(async () =>{
-      const res = await fetch(`/api/user/${rId}`)
-      if(res.ok){
-        const data3 = await res.json()
+      console.log(session);
+      
+      if(session.roles === "seller"){
+        console.log("SELLA");
+      }
+      const [res1, res2] = await Promise.all([
+        fetch(`/api/user/${rId}`),
+        session.roles === "seller"? fetch(`/api/listing?seller=${session.id}`):
+         fetch(`/api/listing?seller=${rId}`)
+      ]) 
+      if(res1.ok && res2.ok){
+        const [data3, data4]= await  Promise.all([res1.json(), res2.json()])
         console.log(data3)
         setReceiver(data3)
+        console.log(data4);
+        if(data4.length > 0){
+          setListings(data4)
+          setProduct(data4[0].product.name)
+        }
+        
+      }
+      if(router.query.product !== undefined){
+        setProduct(router.query.product)
+        
+        setOffer(true)
+      }
+
+      if(router.query.volume !== undefined){
+        setVolume(router.query.volume)
+        
+        setOffer(true)
+      }
+
+      if(router.query.price !== undefined){
+        setPrice(router.query.price)
+        
+        setOffer(true)
       }
     },[])
     
 
     const [messageText, setMessageText] = useState("");
+    const [offer, setOffer] = useState(false);
     const [receivedMessages, setMessages] = useState([]);
     const messageTextIsEmpty = messageText.trim().length === 0;
     useEffect(()=>{
@@ -83,11 +126,22 @@ const isReachingEnd =
         let message = "";
         if(type === "text"){
           receiver.publish({ name: `message_sent`, data: {text: messageText} });
-          message = {data: {text: messageText, r: rId}, connectionId: "me"}
+          message = {name: "image_sent", data: {text: messageText, r: rId}, connectionId: "me"}
+        }
+        else if(type=== "link"){
+          receiver.publish({ name: `image_sent`, data: {link: messageText} });
+          message = {name: "image_sent", data: {link: messageText, r: rId}, connectionId: "me"}
+        }
+        else if(type === "offer"){
+          receiver.publish({ name: `offer_sent`, data: {offer: messageText} });
+          message = {name: "offer_sent", data: {offer: messageText, r: rId}, connectionId: "me"}
+          setOffer(false)
+          
         }
         else{
-          receiver.publish({ name: `message_sent`, data: {link: messageText} });
-          message = {data: {link: messageText, r: rId}, connectionId: "me"}
+          console.log("object");
+          receiver.publish({ name: `offer_accepted`, data: {offer: messageText}});
+          message ={name: "offer_accepted", data: {offer: messageText, r: rId}, connectionId: "me"}
         }
          
         setMessages((prev) =>[...prev, message])
@@ -127,17 +181,39 @@ const isReachingEnd =
 
       const handleOffer = (e) =>{
         e.preventDefault();
+        setOffer(!offer)
         console.log("Discount")
       }
 
+      const sendOffer = (message) =>{
+        console.log(product);
+        
+
+        sendMessage(message, "offer")
+      }
+      
+
     const handleSubmit = (e) =>{
         e.preventDefault();
-        
+        console.log("Hello");
         if(isFilePicked){
           fileUpload(selectedFile)
         }
-        else{
+        console.log(messageText);
+        if(messageText !== "" && messageText !== undefined ){
           sendMessage(messageText, "text");
+        }
+        if(offer){
+          const listing = listings.find(listing => listing.product.name === product)
+        console.log(listing);
+        const message = {
+          listing: listing._id,
+          price: price,
+          volume: volume,
+          product: product,
+          sameSeller: listing.seller._id === session.id
+        }
+          sendOffer(message)
         }
         
         //console.log(receivedMessages);
@@ -196,7 +272,10 @@ const isReachingEnd =
             }
           }
         };
-
+        const getListingInfo = ( name) =>{
+          
+          console.log(name);
+        }
 
     const openInput = (e) =>{
       e.preventDefault()
@@ -233,9 +312,25 @@ const isReachingEnd =
                       const author = message.sender === session.id ? "me" : "other"
                       console.log(message)
                       return(
-                        <li key={message._id} className={`flex ${author !== "me"? "justify-start" : "justify-end"}`}>
+                        <li key={message._id} className={`flex ${author !== "me"? "justify-start" : "justify-end" }`}>
                             <div className={`inline-block w-fit max-w-sm lg:max-w-xl px-4 py-2 text-gray-700 rounded shadow ${author === "me"? "bg-[#FFA500] text-right": "bg-gray-100 text-left"}`}>
-                                {typeof message.message?.text === "string"? message.message?.text: <img className="object-cover rounded-md" src={message.message?.link} />}
+                            {message.message.data?.text !== undefined &&<span className="block" data-author={author}>{message.message.data.text}</span>}
+                                {message.message.data?.link !== undefined && <img className="object-cover rounded-md" src={message.message.data?.link} />}
+                                {message.message.name === "offer_sent" && 
+                                <Offer 
+                                  offer = {message.message.data.offer}
+                                  sendMessage = {sendMessage}
+                                  author={author}
+                                />}
+                                {message.message.name === "offer_accepted" &&
+                                <div>
+                                    <PaymentButton
+                                      listingId={message.message.data.offer.listing}
+                                      amount={message.message.data.offer.price}
+                                      bargain= {"true"}
+                                      sameSeller={listings.find(listing => listing.seller._id === session.id)?._id === message.message.data.offer.listing}
+                                    />
+                                </div> }
                             </div>
                         </li>) 
                     })
@@ -246,12 +341,32 @@ const isReachingEnd =
                       console.log(ably.connection.id);
                         const author = message?.connectionId === "me" ? "me" : "other";
                         console.log(message.data?.link)
+                        const isSeller = message.name === "offer_accepted" && listings?.find(listing => listing?.seller._id === session.id)?._id === message.data.offer.listing
                         return(
-                        <li key={index} className={`flex ${author !== "me"? "justify-start" : "justify-end"} mb-1`}>
+                        <li key={index} className={`flex ${message.name === "offer_accepted"? "justify-center": author !== "me"? "justify-start" : "justify-end"} ${message.name === "offer_accepted" &&  
+                        isSeller && "hidden"} mb-1`}>
                             <div className={`object-scale-down relative max-w-sm  lg:max-w-xl px-4 py-2 text-gray-700 rounded shadow ${author === "me"? "bg-[#FFA500]": "bg-gray-100"}`}>
-                                {message.data?.text !== undefined &&<span className="block" data-author={author}>{message.data.text}</span>}
+                            {message.data?.text !== undefined &&<span className="block" data-author={author}>{message.data.text}</span>}
                                 {message.data?.link !== undefined && <img className="object-cover rounded-md" src={message.data?.link} />}
+                                {message.name === "offer_sent" && 
+                                <Offer 
+                                  offer = {message.data.offer}
+                                  sendMessage = {sendMessage}
+                                  author={author}
+                                />}
+                                {message.name === "offer_accepted" &&
+                                <div>
+                                    <PaymentButton
+                                      listingId={message.data.offer.listing}
+                                      amount={message.data.offer.price}
+                                      bargain= {"true"}
+                                      sameSeller={isSeller}
+                                    />
+                                </div> }
+                                
                             </div>
+
+                            
                         </li>)
                     })
                 }
@@ -261,29 +376,104 @@ const isReachingEnd =
 
             <div className="flex items-center justify-between w-full p-3 border-t border-gray-300">
               
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                
               
                 <input type="file" className="hidden" id="fileUploadInput" onChange={addFile}/>
               <button onClick={openInput} disabled={isFilePicked}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-500 mx-2" fill="currentColor" viewBox="0 0 487 487"
+                  >
+                  <g>
+                    <path d="M308.1,277.95c0,35.7-28.9,64.6-64.6,64.6s-64.6-28.9-64.6-64.6s28.9-64.6,64.6-64.6S308.1,242.25,308.1,277.95z
+                      M440.3,116.05c25.8,0,46.7,20.9,46.7,46.7v122.4v103.8c0,27.5-22.3,49.8-49.8,49.8H49.8c-27.5,0-49.8-22.3-49.8-49.8v-103.9
+                      v-122.3l0,0c0-25.8,20.9-46.7,46.7-46.7h93.4l4.4-18.6c6.7-28.8,32.4-49.2,62-49.2h74.1c29.6,0,55.3,20.4,62,49.2l4.3,18.6H440.3z
+                      M97.4,183.45c0-12.9-10.5-23.4-23.4-23.4c-13,0-23.5,10.5-23.5,23.4s10.5,23.4,23.4,23.4C86.9,206.95,97.4,196.45,97.4,183.45z
+                      M358.7,277.95c0-63.6-51.6-115.2-115.2-115.2s-115.2,51.6-115.2,115.2s51.6,115.2,115.2,115.2S358.7,341.55,358.7,277.95z"/>
+                  </g>
                 </svg>
               </button>
 
+
+              <div className={` w-full mx-auto`}>
+               
+              {isFilePicked && <div><img className="object-cover max-w-sm w-full max-h-xs rounded-lg mx-auto" src={image}/></div>}
               
-                {!isFilePicked&& <input type="text" placeholder="Message" value={messageText}
-              onKeyPress={handleKeyPress}
-              ref={(element) => { inputBox = element; }}
-              onChange={e => setMessageText(e.target.value)}
-                className="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700"
-                name="message" required />}
-              {isFilePicked && <div><img className="object-cover max-w-full max-h-sm rounded-lg" src={image}/></div>}
+              
+              {offer && <div className=" bg-gray-100 py-2 pl-4 mx-3 mb-3">
+                <div className={`p-2 mx-auto w-full`}>
+                  <div className={` ${session.roles === "buyer" && "hidden"} ${receiver?.data.roles === "buyer"&& "hidden"}`}>
+                  <button className={`px-4 `} onClick={ (e) =>{e.preventDefault(); getListingInfo("BUY")}}>
+                  BUY
+                </button>
+                <button className="px-4" onClick={ (e) =>{e.preventDefault(); getListingInfo("SELL")}}>SELL</button>
+                  </div>
+                
+                    <form>
+                      <div className="body-form">
+                      <label htmlFor="product">Product:</label>
+                            <select
+                                className="ml-4 form-select text-base"
+                                
+                                placeholder="Product Name"
+                                required
+                                value={product}
+                                onChange={(e) => setProduct(e.target.value=== "Select an Option" ? "": e.target.value)}
+            
+                                name="product"
+                            >
+                              <option defaultValue="none" selected disabled hidden>Select Product</option>
+                              {
+                                listings?.map((listing) => {
+                                  return <option key = {listing._id} >{listing.product.name}</option>
+                                })
+                              }
+                            </select>
+                            
+                      </div>
+                      <div className="body-form">
+                      <label htmlFor="volume">Volume:</label>
+                      <input size="4" className="ml-4" type="text" 
+                      onChange={(e) => setVolume(e.target.value=== "Select an Option" ? "": e.target.value)}
+                      value={volume}></input>
+                            <select
+                                className="ml-4 form-select text-base"
+                                
+                                placeholder="Product Name"
+                                required
+                                value={messageText}
+                                
+                                name="email"
+                                autoComplete="email"
+                            >
+                              <option defaultValue="none">pt</option>
+                            </select>
+                      </div>
+
+                      <div className="body-form">
+                      <label htmlFor="product">Price:</label>
+                      <input 
+                      onChange={(e) => setPrice(e.target.value=== "Select an Option" ? "": e.target.value)}
+                      size="4" className="ml-8" type="text" value={price}></input>
+                      </div>
+
+                      
+                         <button type="submit" onClick={handleSubmit} className=" bg-[#FFA500] m-2 py-3 px-3 rounded-md">
+                          SEND OFFER
+                        
+                      </button>
+                  </form></div>
+                
+                </div>}
+              
+                
+                {<div><input type="text" placeholder="Message" value={messageText}
+                onKeyPress={handleKeyPress}
+                ref={(element) => { inputBox = element; }}
+                onChange={e => setMessageText(e.target.value)}
+                  className="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700"
+                  name="message" required /></div>}
+                
+                
+              </div>
                 
               
       
@@ -316,8 +506,9 @@ const isReachingEnd =
                   </g>
                 </svg>
               </button>
-              <button type="submit" onClick={ handleSubmit}>
-                <svg className="w-5 h-5 text-gray-500 origin-center transform rotate-90" xmlns="http://www.w3.org/2000/svg"
+              {console.log(isFilePicked)}
+              <button type="submit" onClick={ handleSubmit} disabled={messageText === "" && !isFilePicked}>
+                <svg className="w-5 h-5 text-gray-500 origin-center transform rotate-90 mx-2" xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20" fill="currentColor">
                   <path
                     d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />

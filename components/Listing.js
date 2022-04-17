@@ -21,18 +21,22 @@ const Listing = ({listing}) => {
 
     const handleRedirect = (e) =>{
         e.preventDefault() 
-        router.push(`/chat/${listing.seller._id}`)
+        router.push(`/chat/${listing.seller._id}?product=${listing.product.name}&price=${listing.startingPrice}`)
     }
     return ( 
         <div className="grid grid-cols-4 md:grid-cols-1 sm:undo:grid drop-shadow-xl m-4 px-2 py-4 bg-slate-100 rounded-md">
             <div className="col-span-3 grid grid-cols-3 md:grid-cols-1">
                 <div className="flex justify-center px-2 py-4">
-                    <Image 
-                    className="rounded-full col-span-1"
-                    src={listing.seller.image}
-                    alt="Profile Pic"
-                    width={100}
-                    height={100}/>
+                    {
+                        listing ? <Image 
+                        className="rounded-full col-span-1"
+                        src={listing && listing.seller.image}
+                        alt="Profile Pic"
+                        width={100}
+                        height={100}/>:
+                        <div class="w-12 bg-gray-300 h-12 rounded-full "/>
+                    }
+                    
                 </div>
 
                 <div className="text-center col-span-2 my-auto">

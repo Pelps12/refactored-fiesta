@@ -7,7 +7,7 @@ const PaymentButton = ({listingId, amount, bargain, sameSeller}) => {
     console.log(sameSeller);
     const handlePayment = async () => {
         setDisabled(true)
-        const res = await fetch('api/user/pay', {
+        const res = await fetch('http://localhost:3000/api/user/pay', {
             body: JSON.stringify({
                 listingId: listingId,
                 amount: amount,
@@ -33,6 +33,7 @@ const PaymentButton = ({listingId, amount, bargain, sameSeller}) => {
             }
             else{
                 setDisabled(false)
+                console.log(await res.json());
                 router.push("/login")
                 console.log("Error")
             }

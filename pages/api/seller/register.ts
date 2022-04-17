@@ -6,8 +6,9 @@ import fetch from "node-fetch"
 import { Long, ObjectId } from 'mongodb'
 import clientPromise from '../../../lib/mongodb'
 var parser = require("ua-parser-js")
-var Mixpanel = require('mixpanel');
+const Mixpanel = require('mixpanel');
 import {v4 as uuidv4} from "uuid"
+const mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
 
 /*!!!!!DO NOT FORGET TO CHANGE THIS */
 const KEY = process.env.JWT_SECRET
@@ -115,7 +116,11 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                                 "subaccount_id": flData.data.subaccount_id,
                                 "area": google_res.results[0]?.address_components[0]?.long_name}})
                         res.status(201).json({addSellerId})
-                        var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
+                        
+                        mixpanel.people.set(addSellerId.insertedId, {
+                            role: "seller"
+                        })
+                        
                         mixpanel.track("Seller Created", {
                             distinct_id: session?.id ?? uuidv4(),
                             $insert_id: uuidv4(),
@@ -138,13 +143,6 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                     //console.log(err.message)
                 }
                 
-
-
-                /*If successful, return a JWT */
-
-                res.status(201).json({
-                    success: true,                    
-                })
             }
             else if(token?.roles === "seller"){
                 res.status(403).json({error: "Already a seller"})

@@ -52,18 +52,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                                     .skip(offset ?? 1)
                                     .project({ _id: 0})
                                     .toArray()
-                        //console.log("Hello");
-                        //console.log("Listings: "+messages)              
-                        var mixpanel = Mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
-                        mixpanel.track("logged in", {
-                            distinct_id: session?.id ?? uuidv4(),
-                            $insert_id: uuidv4(),
-                            ip: ip,
-                            $os: ua.os.name,
-                            $browser: ua.browser.name,
-                            $browser_version: ua.browser.major,
-        
-                        })
+
                         
                         if(messages){
                             res.status(200).json(messages)
@@ -72,17 +61,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                             res.send(404)
                         }
         
-                          
-                        
-                        mixpanel.track("logged in", {
-                            distinct_id: session?.id ?? uuidv4(),
-                            $insert_id: uuidv4(),
-                            ip: ip,
-                            $os: ua.os.name,
-                            $browser: ua.browser.name,
-                            $browser_version: ua.browser.major,
-        
-                        })
+
                         //console.log(ua)
                         
                     

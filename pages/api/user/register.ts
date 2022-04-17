@@ -60,7 +60,8 @@ export default async function sellerReg(req: NextApiRequest, res:NextApiResponse
                     mixpanel.people.set(user.insertedId, {
                         $first_name: first_name,
                         $last_name: last_name,
-                        $email: email
+                        $email: email,
+                        role: "buyer"
                     })
                     mixpanel.track("Sign Up", {
                         distinct_id: user.insertedId,
