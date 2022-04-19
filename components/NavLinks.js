@@ -27,9 +27,9 @@ const NavLinks = (props) => {
     <li className={navStyle.navList} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/">Home</Link></li>
     <li className={navStyle.navList} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/about">About</Link></li>
     <li className={navStyle.navList} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/contact">Contact</Link></li>
-    {auth ? null :     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="">Sign Up</Link></li>}
-    {auth ?     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="">Account</Link></li> :     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/login">Log In</Link></li>}
-    {sellerAuth ? <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="">Seller</Link></li> : <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/register/seller">Become Link Seller</Link></li>}
+    {auth ? null :     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/register">Sign Up</Link></li>}
+    {auth ?     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/dashboard">Account</Link></li> :     <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/login">Log In</Link></li>}
+    {sellerAuth ? <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/dashboard">Seller</Link></li> : <li className={`${navStyle.navList} ${navStyle.hideMenu}`} onClick={()=> props.isMobile && props.closeMobileMenu()}><Link className={navStyle.navAnchor} href="/register/seller">Become Link Seller</Link></li>}
   </ul>
   )
 }

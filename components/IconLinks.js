@@ -25,8 +25,8 @@ const IconLinks = () => {
         <ul>
           <li>{auth ? <Link href="/register">Messages</Link> : <Link href="/register">Sign Up</Link>}</li>
           {auth ? null : <li><Link href="/login">Log In</Link></li>}
-          {auth ? <li><Link href="">Account</Link></li> : null}
-          {auth ? <li><Link onClick={handleSubmit}>Sign Out</Link></li> : null}
+          {auth ? <li><Link href="/dashboard">Account</Link></li> : null}
+          {auth ? <li><button onClick={handleSubmit}>Sign Out</button></li> : null}
         </ul>
       </div>
 
