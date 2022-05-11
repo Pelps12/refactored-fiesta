@@ -40,7 +40,8 @@ const Listing = ({listing}) => {
                 </div>
 
                 <div className="text-center col-span-2 my-auto">
-                    <h2 className="text-xl md:text-3xl px-2 md:py-4">{listing.seller.storename}</h2>
+                    <h2 className="text-xl md:text-3xl px-2 md:py-4">{listing.seller.storename} </h2>
+                    {!router.query.product && <h2 className="text-xl md:text-2xl px-2 md:py-4">{listing.product.name} </h2>}
                     <h3 className="text-lg md:text-2xl px-1 md:py-3">₦{listing.startingPrice}</h3>
                 </div>
                 

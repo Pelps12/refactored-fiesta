@@ -10,8 +10,10 @@ var parser = require("ua-parser-js")
 var Mixpanel = require('mixpanel');
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse){
-    console.log()
-    const session: any = await getSession({req})
+    console.log(":)")
+    
+    const session:any = await getToken({req});
+    console.log(session)
     const referer = req.headers['referer']
     console.log(referer)
     
@@ -19,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if(session){
         let {amount, listingId, bargain} = req.body
         amount = DOMPurify.sanitize(amount)
-        console.log(typeof amount)
+        console.log("aount")
         listingId = DOMPurify.sanitize(listingId)
         bargain =DOMPurify.sanitize(bargain)
         const client = await clientPromise;

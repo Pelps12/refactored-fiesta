@@ -44,7 +44,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                 const offset:number = per_page *(page_no - 1)
                 console.log(offset)
                 const query = {...(sellerQ && {seller: new ObjectId(sellerQ)}),
-                            ...(product && product === "mine" && {"product.id": session.id}),
+                            ...(product && product === "mine" && {"seller": session.id}),
                             ...(product && product !== "mine" && {"product.name" : product}),
                             ...(area && {area: area}),
                             ...(near && {location:{
@@ -55,13 +55,16 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                                     },
                                     $maxDistance: parseInt(distance)
                                 }
-                            }})}
+                            },
+                            
+                            }),
+                            available: true}
                
                 listings = await db
                 .collection("listings")
                 .find(query)
                 .limit(isNaN(per_page) ? 2: per_page)
-                .skip(isNaN(offset) ? 1 : offset)
+                .skip(isNaN(offset) ? 0 : offset)
                 .toArray()
                             
                 console.log(query)
@@ -125,11 +128,13 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
             }
         break;
         case "POST":
+            console.log(":)")
             //Get the session
-            const session:any = await getSession({req})
-            const token = await getToken({req})
+            const session:any = await getSession()
+            console.log(`SESSION ${session}`)
+            const token:any = await getToken({req})
             let {expiresAt, startingPrice, productId} = req.body
-            
+            console.log(token)
 
             
             
@@ -139,11 +144,17 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                     expiresAt = DOMPurify.sanitize(expiresAt)
                     startingPrice = DOMPurify.sanitize(startingPrice)
                     productId = DOMPurify.sanitize(productId)
-                    //console.log(40)
-                    const [product, seller] = await Promise.all([
+                    console.log(147)
+                    const [product, seller, sListing] = await Promise.all([
                         db.collection("products").findOne({_id: new ObjectId(productId)}),
-                        db.collection("users").findOne({_id: new ObjectId(session.id)})
+                        db.collection("users").findOne({_id: new ObjectId(token.id)}),
+                        db.collection("listings").findOne({seller: new ObjectId(token.id), "product._id": new ObjectId(productId)})
                     ])
+                    console.log(153)
+                    console.log(sListing);
+                    if(sListing){
+                        return res.status(403).json({error: "Listing already exists"})
+                    }
                     
                     console.log(product)
                     

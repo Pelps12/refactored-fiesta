@@ -35,6 +35,8 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                         const per_page:number = parseInt(url.searchParams.get("per_page"))
                         const page_no:number = parseInt(url.searchParams.get("page"))
                         const start:number = parseInt(url.searchParams.get("start"))
+                        console.log(session.id);
+                        console.log(seller);
                         console.log(new Date(start *1000))
                         if(!page_no && !per_page && !start){
                             return res.status(400).json({error: "Please include per_page, page_no, and start queries"})
@@ -43,7 +45,7 @@ export default async function(req:NextApiRequest, res:NextApiResponse){
                         const query = {$and: [{$or:[{sender:new ObjectId(seller), receiver: new ObjectId(session.id)},
                                             {sender:new ObjectId(session.id), receiver: new ObjectId(seller)}]}, 
                                             {createdAt: {$lt: new Date (start*1000)}}]}
-                        //console.log(query)
+                        console.log(query)
                         messages = await db
                                     .collection("messages")
                                     .find(query)

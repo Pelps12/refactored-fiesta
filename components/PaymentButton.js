@@ -7,6 +7,7 @@ const PaymentButton = ({listingId, amount, bargain, sameSeller}) => {
     console.log(sameSeller);
     const handlePayment = async () => {
         setDisabled(true)
+        //TODO: Change this from "localhost:3000" to "lasprice.com"
         const res = await fetch('http://localhost:3000/api/user/pay', {
             body: JSON.stringify({
                 listingId: listingId,

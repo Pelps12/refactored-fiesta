@@ -8,6 +8,7 @@ export function useChannel(channelName, callbackOnMessage) {
 
     const onMount = () => {
         //ably.connect()
+        console.log(ably.connection.state);
         if(ably.connection.state === "closed" || ably.connection.state === "closing"){
             ably.connect()
         }
@@ -17,7 +18,7 @@ export function useChannel(channelName, callbackOnMessage) {
 
     const onUnmount = () => {
         channel.unsubscribe();
-        
+        console.log(ably.connection.state);
     }
 
     const useEffectHook = () => {

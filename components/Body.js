@@ -173,7 +173,7 @@ const Body = ({locations, products}) => {
                     {listings.map((listing) =>{
                         return(
                             <div key={listing._id}>
-                                <Listing listing={listing} />
+                                <Listing listing={listing}/>
                             </div>           
                         )                   
                     })}

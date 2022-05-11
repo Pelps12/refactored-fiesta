@@ -40,6 +40,7 @@ const ChatBox = ({rId}) => {
       if(session.roles === "seller"){
         console.log("SELLA");
       }
+      console.log(rId);
       const [res1, res2] = await Promise.all([
         fetch(`/api/user/${rId}`),
         session.roles === "seller"? fetch(`/api/listing?seller=${session.id}`):
@@ -122,6 +123,7 @@ const isReachingEnd =
     
 
     const sendMessage =  (messageText, type) => {
+      console.log(ably.channels);
         const receiver = ably.channels.get(`chat:${rId}`)
         let message = "";
         if(type === "text"){
