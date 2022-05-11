@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react"
 import { Widget, WidgetAPI } from "@uploadcare/react-widget";
-import { useChannel } from "../hooks/AblyReactEffect";
+//import { useChannel } from "../hooks/AblyReactEffect";
 
 const Test = () => {
   const [receivedMessages, setMessages] = useState([]);

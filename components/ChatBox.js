@@ -22,6 +22,7 @@ const ChatBox = ({rId}) => {
   const [price, setPrice] = useState("")
   const[listings, setListings] = useState(null)
   const router = useRouter();
+  console.log(`RRRRRRRRRIIIIIIIIIIIIIIDDDDDDDDDDD ${rId}`);
   const [image, setImage] = useState(null)
     const [receiver, setReceiver] = useState(null)
     const {data: session, status} = useSession()
@@ -125,10 +126,11 @@ const isReachingEnd =
     const sendMessage =  (messageText, type) => {
       console.log(ably.channels);
         const receiver = ably.channels.get(`chat:${rId}`)
+        console.log(receiver);
         let message = "";
         if(type === "text"){
           receiver.publish({ name: `message_sent`, data: {text: messageText} });
-          message = {name: "image_sent", data: {text: messageText, r: rId}, connectionId: "me"}
+          message = {name: "message_sent", data: {text: messageText, r: rId}, connectionId: "me"}
         }
         else if(type=== "link"){
           receiver.publish({ name: `image_sent`, data: {link: messageText} });
