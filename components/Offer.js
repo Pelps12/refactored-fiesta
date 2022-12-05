@@ -53,28 +53,30 @@ const Offer = ({offer, sendMessage, author}) => {
     }
     
     return ( 
-    <div className="p-3 mx-auto ">
+    <div className="grid grid-cols-3 mx-auto ">
         <div className="mx-auto">
             <h2 className="text-3xl font-medium text-center">OFFER</h2>
             <h3 className="text-xl font-normal text-center">{offer.product}</h3>
-            <div className="mr-0 justify-center flex flex-col ">
+
+            
+        </div>
+
+        <div className="mr-0 justify-center flex flex-col ">
                 <input size="4" className="mx-auto relative text-center rounded-md" type="text" 
                         onChange={(e) => {setPrice(e.target.value); console.log(price); (e.target.value !== iprice)? setaccOrCounter("COUNTER"): setaccOrCounter("ACCEPT")}}
                         value={price}></input>
             </div>
-            
-        </div>
 
-        <div className="my-auto grid grid-cols-2  justify-end col-span-1">
-                    <div className="px-3  my-auto mx-auto   flex justify-end">
-                    <button className="p-4 py-2 mx-auto bg-red-600 rounded-md text-sm md:text-md" 
+        <div className="my-auto grid grid-rows-2  justify-end col-span-1">
+                    <div className="px-0.5  my-auto mx-auto   flex justify-end">
+                    <button className="p-4 py-2 mx-auto bg-red-600 rounded-md text-sm " 
                     disabled={author === "me" || sent}
                         onClick={handleDecline}>
                             DECLINE</button>
                     </div>
 
                     <div className=" my-2 mx-auto flex justify-end" disabled={author === "me"}>
-                        <button className="p-4 py-2 mx-auto bg-green-600 rounded-md text-sm md:text-md" disabled={author === "me" || sent} onClick={handleSubmit}>
+                        <button className="p-4 py-2 mx-auto bg-green-600 rounded-md text-sm " disabled={author === "me" || sent} onClick={handleSubmit}>
                             {accOrCounter}</button>
                     </div>
                     

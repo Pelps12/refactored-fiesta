@@ -3,6 +3,8 @@ import Flutterwave from "flutterwave-node-v3"
 import {v4 as uuidv4} from "uuid"
 import Mixpanel from "mixpanel";
 import bcrypt from "bcrypt"
+import clientPromise from "../../../lib/mongodb";
+import { ObjectId } from "mongodb";
 
 /*This webhook endpoint verifies flutterwave payment info and sends it to Mixpanel */
 export default async function payment(req: NextApiRequest, res: NextApiResponse){
@@ -51,7 +53,22 @@ export default async function payment(req: NextApiRequest, res: NextApiResponse)
                       ...query,
                 
                     })
-                  
+                    const client = await clientPromise;
+                    const db = client.db(process.env.MONGODB_DB)
+
+                    //STORE TRANSACTION DATA IN DATABASE
+                    try{
+                      db.collection("purchases")
+                      .insertOne({
+                      buyer: new ObjectId(meta?.consumer_id),
+                      seller: new ObjectId(meta?.seller_id),
+                      listing: new ObjectId(meta?.listing_id),
+                      createdAt: new Date(response.data.created_at)
+                      })
+                      
+                  }catch (error) {
+                      console.log(error)
+                  }
                   
                   
                 }else{

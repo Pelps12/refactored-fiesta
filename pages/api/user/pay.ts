@@ -71,6 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         redirect_url: referer ?? "http://localhost:3000/home",
                         meta: {
                             consumer_id: `${session.id}` ,
+                            listing_id: `${listing.id}`,
                             seller_id: `${seller._id}`,
                             ip: ip,
                              os:ua.os.name || "N/A",
@@ -99,6 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     })
                 })
                 const data:any = await response.json()
+                console.log(data)
                 res.status(200).json(data)
 
                 

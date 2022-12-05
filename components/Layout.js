@@ -14,7 +14,9 @@ import { createContext } from "react";
 
 const AblyContext = createContext(null);
 
-const Layout = ( { children } ) => {
+const Layout = ( { children, chatComponent=false } ) => {
+  console.log(children)
+  console.log(chatComponent);
   const router = useRouter();
   const showHeader = router.pathname === "/" ? false : true;
 
@@ -38,7 +40,7 @@ const Layout = ( { children } ) => {
             </header>
       
             <main className="flex-grow p-4"> {children} </main>
-            <Footer/>
+            {!chatComponent && <Footer/>}
           </div>
         </div>
   

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import useSWRInfinite from "swr/infinite"
-import {useChannel} from "../hooks/AblyReactEffect"
+import {useChannel} from "@ably-labs/react-hooks"
 import Offer from "./Offer";
 import {useRecoilState} from "recoil"
 import { paymentState } from "../atoms/modalAtom";
@@ -113,7 +113,12 @@ const isReachingEnd =
     
         
     const [channel, ably] = useChannel(`chat:${session.id}`, (message) =>{
-        console.log(message)
+        
+/*         let messages = localStorage.getItem("messages")
+        let messageObj = JSON.parse(messages)
+        let messageStr = messageObj !== null ? JSON.stringify(messageObj.push(message)): "[" +JSON.stringify(message) + "]"
+        console.log(messageStr)
+        localStorage.setItem("messages", messageStr) */
         const history = receivedMessages.slice(-199);
         setMessages((prev) =>[...prev, message])
         console.log(message);
@@ -150,7 +155,7 @@ const isReachingEnd =
          
         setMessages((prev) =>[...prev, message])
         setMessageText("");
-        inputBox?.focus();
+        //inputBox?.focus();
       }
 
       
@@ -300,7 +305,8 @@ const isReachingEnd =
               </span>
             </div>
             
-            <div className="relative w-full lg:p-6 overflow-y-auto h-[40rem] " id="chat" onScroll={onScroll} ref={listInnerRef}>
+            {/*Chat Box*/}
+            <div className="relative  overflow-y-auto h-[58vh] overflow:hidden" id="chat" onScroll={onScroll} ref={listInnerRef}>
               {/* <div className={`mx-auto content-center w-full ${isReachingEnd? "hidden": null}`}>
                 <button className="bg-[#ff8243] px-4 py-3 mt-1 rounded-md" onClick={() => setSize(size +1)}>
                 {isLoadingMore
@@ -310,14 +316,16 @@ const isReachingEnd =
                               : "More"}
                 </button>
               </div> */}
-              <ul className="space-y-2 mb-0">
+
+              {/* Chat Messages */}
+              <div className="space-y-2 mb-0  overflow-auto bottom-2 absolute w-full mx-0">
                 {
                     oldMessages.slice(0).reverse().map((message) =>{
                       const author = message.sender === session.id ? "me" : "other"
                       console.log(message)
                       return(
-                        <li key={message._id} className={`flex ${author !== "me"? "justify-start" : "justify-end" }`}>
-                            <div className={`inline-block w-fit max-w-sm lg:max-w-xl px-4 py-2 text-gray-700 rounded shadow ${author === "me"? "bg-[#FFA500] text-right": "bg-gray-100 text-left"}`}>
+                        <div key={message._id} className={`absolute  mt-0   ${author !== "me"? "left-0" : "right-0" }`}>
+                            <div className={`${message.message.data?.text !== undefined ? "max-w-xs": null}inline-block w-fit max-w-sm lg:max-w-xl px-4 py-2 text-gray-700 rounded shadow ${author === "me"? "bg-[#FFA500] text-right": "bg-gray-100 text-left"}`}>
                             {message.message.data?.text !== undefined &&<span className="block" data-author={author}>{message.message.data.text}</span>}
                                 {message.message.data?.link !== undefined && <img className="object-cover rounded-md" src={message.message.data?.link} />}
                                 {message.message.name === "offer_sent" && 
@@ -336,7 +344,7 @@ const isReachingEnd =
                                     />
                                 </div> }
                             </div>
-                        </li>) 
+                        </div>) 
                     })
                 }
                 {
@@ -347,9 +355,9 @@ const isReachingEnd =
                         console.log(message.data?.link)
                         const isSeller = message.name === "offer_accepted" && listings?.find(listing => listing?.seller._id === session.id)?._id === message.data.offer.listing
                         return(
-                        <li key={index} className={`flex ${message.name === "offer_accepted"? "justify-center": author !== "me"? "justify-start" : "justify-end"} ${message.name === "offer_accepted" &&  
+                        <div key={index} className={`flex ${message.name === "offer_accepted"? "justify-center": author !== "me"? "justify-start" : "justify-end"} ${message.name === "offer_accepted" &&  
                         isSeller && "hidden"} mb-1`}>
-                            <div className={`object-scale-down relative max-w-sm  lg:max-w-xl px-4 py-2 text-gray-700 rounded shadow ${author === "me"? "bg-[#FFA500]": "bg-gray-100"}`}>
+                            <div className={`object-scale-down relative ${message.name === "offer_sent"?"max-w-full": null}  lg:max-w-xl px-4 py-2 text-gray-700 rounded shadow ${author === "me"? "bg-[#FFA500]": "bg-gray-100"}`}>
                             {message.data?.text !== undefined &&<span className="block" data-author={author}>{message.data.text}</span>}
                                 {message.data?.link !== undefined && <img className="object-cover rounded-md" src={message.data?.link} />}
                                 {message.name === "offer_sent" && 
@@ -371,10 +379,10 @@ const isReachingEnd =
                             </div>
 
                             
-                        </li>)
+                        </div>)
                     })
                 }
-                </ul>
+                </div>
                 <div ref={(element) => { messageEnd = element; }}></div>
             </div>
 
